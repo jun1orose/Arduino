@@ -229,16 +229,9 @@ public class EditorToolbar extends JComponent implements MouseInputListener, Key
       if (currentRollover != SERIAL && currentRollover != EMULATOR)
         g.drawString(status, (buttonCount - 2) * BUTTON_WIDTH + 3 * BUTTON_GAP, statusY);
       else {
-        if (currentRollover == SERIAL) {
-          int statusX = x1[EMULATOR] - BUTTON_GAP;
-          statusX -= g.getFontMetrics().stringWidth(status);
-          g.drawString(status, statusX, statusY);
-        }
-        if (currentRollover == EMULATOR) {
-          int statusX = x1[EMULATOR] - BUTTON_GAP;
-          statusX -= g.getFontMetrics().stringWidth(status);
-          g.drawString(status, statusX, statusY);
-        }
+        int statusX = x1[EMULATOR] - BUTTON_GAP;
+        statusX -= g.getFontMetrics().stringWidth(status);
+        g.drawString(status, statusX, statusY);
       }
     }
 
