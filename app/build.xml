@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <project name="Arduino PDE" default="build">
+  <typedef resource="org/jetbrains/kotlin/ant/antlib.xml"
+           classpath="${user.home}/.sdkman/candidates/kotlin/current/lib/kotlin-ant.jar"/>
+
 
   <path id="class.path">
     <fileset dir="lib">
@@ -92,6 +95,7 @@
            includeAntRuntime="false"
            debug="true"
            classpathref="class.path.test">
+      <withKotlin/>
     </javac>
 
     <copy todir="test-bin" overwrite="true" verbose="true">
