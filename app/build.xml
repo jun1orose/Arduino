@@ -77,12 +77,14 @@
     <fail />
 -->
     <javac source="1.8" target="1.8"
-	   srcdir="src"
-	   destdir="bin"
-	   encoding="UTF-8"
-	   includeAntRuntime="false"
-	   debug="true"
-	   classpathref="class.path" />
+           srcdir="src"
+           destdir="bin"
+           encoding="UTF-8"
+           includeAntRuntime="false"
+           debug="true"
+           classpathref="class.path" >
+        <withKotlin/>
+    </javac>
   </target>
 
   <target name="test" depends="compile" description="Runs the test">
@@ -95,7 +97,6 @@
            includeAntRuntime="false"
            debug="true"
            classpathref="class.path.test">
-      <withKotlin/>
     </javac>
 
     <copy todir="test-bin" overwrite="true" verbose="true">

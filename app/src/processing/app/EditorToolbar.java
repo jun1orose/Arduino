@@ -23,6 +23,8 @@
 
 package processing.app;
 
+import cc.arduino.view.Event;
+
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import java.awt.*;
@@ -388,7 +390,8 @@ public class EditorToolbar extends JComponent implements MouseInputListener, Key
         break;
 
       case EMULATOR:
-        editor.handleSerial();
+        EmulatorBase emulator = new EmulatorBase("Emulator");
+        emulator.setVisible(true);
         break;
 
       default:
