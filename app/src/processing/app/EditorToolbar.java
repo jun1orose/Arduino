@@ -390,8 +390,7 @@ public class EditorToolbar extends JComponent implements MouseInputListener, Key
         break;
 
       case EMULATOR:
-        EmulatorBase emulator = new EmulatorBase("Emulator");
-        emulator.setVisible(true);
+        editor.base.handleEmulator();
         break;
 
       default:

@@ -2375,4 +2375,8 @@ public class Base {
     return recentSketchesMenuItems;
   }
 
+  // behavior for Emulator button
+  public void handleEmulator() {
+    EmulatorBase.Companion.createEmulator();
+  }
 }
