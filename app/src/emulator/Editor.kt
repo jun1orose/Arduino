@@ -6,12 +6,12 @@ import javax.swing.JFrame
 
 class Editor private constructor(): JFrame() {
 
+  private object Holder { var INSTANCE : Editor? = null }
+
   init {
     initWindow("Emulator")
     setCustomCloseOperation()
   }
-
-  private object Holder { var INSTANCE : Editor? = null }
 
   companion object {
     fun createEmulator() {
@@ -31,6 +31,10 @@ class Editor private constructor(): JFrame() {
     setTitle(title)
     setSize(400, 400)
     setLocationRelativeTo(null)
+
+    val circuitComponent = CircuitComponent()
+    contentPane.add(circuitComponent)
+    circuitComponent.isVisible = true
   }
 
   private fun setCustomCloseOperation() {
