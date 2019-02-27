@@ -1,15 +1,18 @@
 package emulator
 
+import java.awt.BorderLayout
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
+import javax.swing.JButton
 import javax.swing.JFrame
+import javax.swing.JPanel
 
 class Editor private constructor(): JFrame() {
 
   private object Holder { var INSTANCE : Editor? = null }
 
   init {
-    initWindow("Emulator")
+    initEmulatorUI("Emulator")
     setCustomCloseOperation()
   }
 
@@ -27,14 +30,19 @@ class Editor private constructor(): JFrame() {
     }
   }
 
-  private fun initWindow(title: String) {
+  private fun initEmulatorUI(title: String) {
     setTitle(title)
     setSize(400, 400)
     setLocationRelativeTo(null)
 
     val circuitComponent = CircuitComponent()
     contentPane.add(circuitComponent)
-    circuitComponent.isVisible = true
+
+    val panel = JPanel()
+    val debugButton = JButton("Debug")
+    debugButton.addActionListener { val debugInfo = DebugInfo(this@Editor) }
+    panel.add(debugButton)
+    contentPane.add(panel, BorderLayout.PAGE_START)
   }
 
   private fun setCustomCloseOperation() {

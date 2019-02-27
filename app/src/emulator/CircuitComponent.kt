@@ -2,6 +2,8 @@ package emulator
 
 import java.awt.*
 import java.awt.image.BufferedImage
+import java.io.File
+import javax.imageio.ImageIO
 import javax.swing.JComponent
 
 class CircuitComponent: JComponent() {
@@ -22,12 +24,14 @@ class CircuitComponent: JComponent() {
 
       val gr2 = buffer?.createGraphics()
       enableAntiAlias(gr2)
-      gr2?.color = Color.BLACK
+      gr2?.color = Color.WHITE
       gr2?.fillRect(0, 0, width, height)
 
     }
 
     g?.drawImage(buffer, 0, 0, null)
+    val mcuImage: BufferedImage = ImageIO.read(File("app/src/emulator/avr.png"))
+    g?.drawImage(mcuImage, width / 2 - mcuImage.width / 2, height / 2 - mcuImage.height / 2, null)
 
   }
 
