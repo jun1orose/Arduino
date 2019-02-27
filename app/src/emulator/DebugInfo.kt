@@ -1,7 +1,5 @@
 package emulator
 
-import java.awt.BorderLayout
-import java.awt.Dimension
 import javax.swing.JFrame
 import javax.swing.JTable
 
@@ -13,9 +11,11 @@ class DebugInfo(parent: Editor) : JFrame() {
   }
 
   private fun initDebugTable() {
-    val table = JTable(3, 4)
-    table.size = Dimension(200, 200)
-    contentPane.add(table, BorderLayout.PAGE_END)
+    val columnNames = arrayOf("Register", "Value")
+    val data = arrayOf(arrayOf("A0", "0b0"), arrayOf("A1", "0b1"))
+    val table = JTable(data, columnNames)
+    
+    contentPane.add(table)
   }
 
   private fun initDebugInfoUI(title: String, parent: Editor, size: Int) {
