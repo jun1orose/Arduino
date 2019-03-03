@@ -32,7 +32,7 @@ class Editor private constructor(): JFrame() {
 
   private fun initEmulatorUI(title: String) {
     setTitle(title)
-    setSize(400, 400)
+    setSize(800, 800)
     setLocationRelativeTo(null)
 
     val circuitComponent = CircuitComponent()

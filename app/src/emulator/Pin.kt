@@ -2,15 +2,16 @@ package emulator
 
 import java.awt.Color
 import java.awt.Graphics2D
+import java.awt.Point
 import java.awt.geom.Point2D
 
-class Pin(val pos: Point2D, val rad: Int) {
+class Pin(val pos: Point, val rad: Int) {
 
   private var inputValue: Int? = null
 
   fun drawTo(gr2: Graphics2D) {
     gr2.color = Color.blue
-    gr2.drawOval(pos.x.toInt(), pos.y.toInt(), rad, rad)
+    gr2.fillOval(pos.x, pos.y, rad, rad)
   }
 
   fun setValue(value: Int) {
