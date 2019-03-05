@@ -5,7 +5,7 @@ import java.awt.Graphics2D
 import java.awt.Point
 import java.awt.geom.Point2D
 
-class Pin(val pos: Point, val rad: Int) {
+class Pin(val pos: Point, private val rad: Int) {
 
   var inputValue: Int? = null
 

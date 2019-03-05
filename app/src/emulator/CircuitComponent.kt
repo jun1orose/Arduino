@@ -1,14 +1,40 @@
 package emulator
 
 import java.awt.*
+import java.awt.event.MouseEvent
+import java.awt.event.MouseListener
 import java.awt.image.BufferedImage
 import javax.swing.JComponent
+import javax.swing.SwingUtilities
 
 class CircuitComponent: JComponent() {
 
   private var buffer: BufferedImage? = null
   private var antiAlias = true
   private object Pins { val INSTANCE = mutableListOf<Pin>()}
+
+  init {
+      this.addMouseListener(object : MouseListener {
+        override fun mouseClicked(p0: MouseEvent) {
+          SwingUtilities.invokeLater {
+            val pos = Point(p0.x, p0.y)
+
+            for(pin in Pins.INSTANCE) {
+                if (pin.isPin(pos)) {
+                  synchronized(pin) {
+                    ModalPinInput(pin, this@CircuitComponent)
+                  }
+                }
+              }
+          }
+        }
+
+        override fun mouseEntered(p0: MouseEvent?) {}
+        override fun mouseExited(p0: MouseEvent?) {}
+        override fun mousePressed(p0: MouseEvent?) {}
+        override fun mouseReleased(p0: MouseEvent?) {}
+      })
+  }
 
   override fun paintComponent(g: Graphics?) {
     super.paintComponent(g)
