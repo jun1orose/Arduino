@@ -4,22 +4,21 @@ import java.awt.GridLayout
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 import java.awt.event.WindowEvent
-import javax.swing.JComponent
 import javax.swing.JDialog
+import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JTextField
 
-class ModalPinInput(chosenPin: Pin, parentWindow: JComponent): JDialog() {
+class ModalPinInput(chosenPin: Pin, parentWindow: JFrame): JDialog(parentWindow, true) {
 
   init {
     this.title = "Input"
     setSize(200, 100)
     setLocationRelativeTo(parentWindow)
-    isVisible = true
 
     val text = JLabel("Binary pin value: ")
     val inputField = JTextField()
-    JTextField().text = chosenPin.inputValue.toString()
+    inputField.text = chosenPin.inputValue?.toString() ?: "empty"
 
     inputField.setSize(20, 10)
     this.layout = GridLayout(1, 2)
@@ -39,6 +38,8 @@ class ModalPinInput(chosenPin: Pin, parentWindow: JComponent): JDialog() {
 
       override fun keyTyped(p0: KeyEvent?) {}
     })
+
+    this.isVisible = true
   }
 
   fun getInputFromField(inputField: JTextField) = inputField.text.toInt()
