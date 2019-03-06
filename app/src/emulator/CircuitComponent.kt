@@ -5,9 +5,9 @@ import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import java.awt.image.BufferedImage
 import javax.swing.JComponent
-import javax.swing.SwingUtilities
+import javax.swing.JFrame
 
-class CircuitComponent: JComponent() {
+class CircuitComponent(parentWindow: JFrame): JComponent() {
 
   private var buffer: BufferedImage? = null
   private var antiAlias = true
@@ -16,16 +16,11 @@ class CircuitComponent: JComponent() {
   init {
       this.addMouseListener(object : MouseListener {
         override fun mouseClicked(p0: MouseEvent) {
-          SwingUtilities.invokeLater {
-            val pos = Point(p0.x, p0.y)
-
-            for(pin in Pins.INSTANCE) {
-                if (pin.isPin(pos)) {
-                  synchronized(pin) {
-                    ModalPinInput(pin, this@CircuitComponent)
-                  }
-                }
-              }
+          val pos = Point(p0.x, p0.y)
+          for(pin in Pins.INSTANCE) {
+            if (pin.isPin(pos)) {
+              ModalPinInput(pin, parentWindow)
+            }
           }
         }
 

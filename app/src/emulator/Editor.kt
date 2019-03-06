@@ -35,7 +35,7 @@ class Editor private constructor(): JFrame() {
     setSize(800, 800)
     setLocationRelativeTo(null)
 
-    val circuitComponent = CircuitComponent()
+    val circuitComponent = CircuitComponent(this@Editor)
     contentPane.add(circuitComponent)
 
     val panel = JPanel()
