@@ -11,4 +11,6 @@ class MCU(private val name: String) {
   }
 
   fun getPinByPos(pinPos: Point) = pins.find { it.pos == pinPos }
+
+  fun getPins() = pins
 }

@@ -14,7 +14,7 @@ class CircuitComponent(parentWindow: JFrame): JComponent() {
   private var buffer: BufferedImage? = null
   private var antiAlias = true
   private object Pins { val INSTANCE = mutableListOf<Pin>() }
-  private val mcu = MCU("atmega328", 400)
+  private object MCU { val INSTANCE = MCU("atmega328", 400)}
 
   init {
       this.addMouseListener(object : MouseListener {
@@ -22,7 +22,7 @@ class CircuitComponent(parentWindow: JFrame): JComponent() {
           val pos = Point(p0.x, p0.y)
           for(pin in Pins.INSTANCE) {
             if (pin.isPin(pos)) {
-              mcu.getCore().getPinByPos(pin.pos)?.apply {
+              getMCU().getCore().getPinByPos(pin.pos)?.apply {
                 ModalPinInput(this, parentWindow)
               }
             }
@@ -53,8 +53,8 @@ class CircuitComponent(parentWindow: JFrame): JComponent() {
       gr2.color = Color.WHITE
       gr2.fillRect(0, 0, width, height)
 
-      val startPoint = Point((width - mcu.width) / 2, (height - mcu.width) / 2)
-      mcu.drawTo(gr2, startPoint)
+      val startPoint = Point((width - getMCU().width) / 2, (height - getMCU().width) / 2)
+      getMCU().drawTo(gr2, startPoint)
     }
 
     g?.drawImage(buffer, 0, 0, null)
@@ -75,5 +75,7 @@ class CircuitComponent(parentWindow: JFrame): JComponent() {
     }
 
     fun getPins() = Pins.INSTANCE
+
+    fun getMCU() = MCU.INSTANCE
   }
 }
