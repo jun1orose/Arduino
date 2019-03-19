@@ -1,7 +1,7 @@
 package emulator.gui
 
-import emulator.elements.MCU
-import emulator.elements.Pin
+import emulator.shapes.MCU
+import emulator.shapes.Pin
 import java.awt.*
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
@@ -13,7 +13,8 @@ class CircuitComponent(parentWindow: JFrame): JComponent() {
 
   private var buffer: BufferedImage? = null
   private var antiAlias = true
-  private object Pins { val INSTANCE = mutableListOf<Pin>()}
+  private object Pins { val INSTANCE = mutableListOf<Pin>() }
+  private val mcu = MCU("atmega328", 400)
 
   init {
       this.addMouseListener(object : MouseListener {
@@ -21,7 +22,9 @@ class CircuitComponent(parentWindow: JFrame): JComponent() {
           val pos = Point(p0.x, p0.y)
           for(pin in Pins.INSTANCE) {
             if (pin.isPin(pos)) {
-              ModalPinInput(pin, parentWindow)
+              mcu.getCore().getPinByPos(pin.pos)?.apply {
+                ModalPinInput(this, parentWindow)
+              }
             }
           }
         }
@@ -50,7 +53,6 @@ class CircuitComponent(parentWindow: JFrame): JComponent() {
       gr2.color = Color.WHITE
       gr2.fillRect(0, 0, width, height)
 
-      val mcu = MCU("ATmega328", 400)
       val startPoint = Point((width - mcu.width) / 2, (height - mcu.width) / 2)
       mcu.drawTo(gr2, startPoint)
     }
