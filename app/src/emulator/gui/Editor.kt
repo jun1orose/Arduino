@@ -1,4 +1,4 @@
-package emulator
+package emulator.gui
 
 import java.awt.BorderLayout
 import java.awt.event.WindowAdapter
@@ -51,8 +51,8 @@ class Editor private constructor(): JFrame() {
 
     this.addWindowListener(object : WindowAdapter() {
       override fun windowClosing(e: WindowEvent?) {
-        Editor.Holder.INSTANCE?.dispose()
-        Editor.Holder.INSTANCE = null
+        Holder.INSTANCE?.dispose()
+        Holder.INSTANCE = null
       }
     })
   }

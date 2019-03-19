@@ -1,4 +1,4 @@
-package emulator
+package emulator.elements
 
 import java.awt.Color
 import java.awt.Graphics2D

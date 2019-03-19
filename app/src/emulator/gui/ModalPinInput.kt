@@ -1,5 +1,6 @@
-package emulator
+package emulator.gui
 
+import emulator.elements.Pin
 import java.awt.GridLayout
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
@@ -10,7 +11,6 @@ import javax.swing.JLabel
 import javax.swing.JTextField
 
 class ModalPinInput(chosenPin: Pin, parentWindow: JFrame): JDialog(parentWindow, true) {
-
   init {
     this.title = "Input"
     setSize(200, 100)

@@ -42,7 +42,7 @@ import cc.arduino.view.Event;
 import cc.arduino.view.JMenuUtils;
 import cc.arduino.view.SplashScreenHelper;
 import com.github.zafarkhaja.semver.Version;
-import emulator.EmulatorBase;
+import emulator.gui.EmulatorBase;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import processing.app.debug.TargetBoard;

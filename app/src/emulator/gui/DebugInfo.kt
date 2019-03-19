@@ -1,4 +1,4 @@
-package emulator
+package emulator.gui
 
 import javax.swing.JFrame
 import javax.swing.JTable

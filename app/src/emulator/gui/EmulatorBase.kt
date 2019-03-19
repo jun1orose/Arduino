@@ -1,4 +1,6 @@
-package emulator
+package emulator.gui
+
+import emulator.gui.Editor
 
 class EmulatorBase  {
 

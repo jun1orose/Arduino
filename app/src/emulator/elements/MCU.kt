@@ -1,5 +1,6 @@
-package emulator
+package emulator.elements
 
+import emulator.gui.CircuitComponent
 import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.Point
