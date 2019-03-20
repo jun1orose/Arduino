@@ -8,14 +8,14 @@ from pysimavr.vcdfile import VcdFile
 import sys
 
 
-def _create_avr(mcu, f_cpu, code):
+def create_avr(mcu, f_cpu, code):
     cc = AvrGcc(mcu=mcu)
     cc.build(code)
     fw = Firmware(cc.output)
     return Avr(mcu=mcu, firmware=fw, f_cpu=f_cpu)
 
 
-def test_firmware():
+def test_avr():
     mcu = 'atmega128'
     code = '''
     #include <avr/io.h>
@@ -38,7 +38,7 @@ def test_firmware():
 
     callback_mock = Mock(side_effect=port_callback)
 
-    avr = _create_avr(mcu, 16000000, code)
+    avr = create_avr(mcu, 16000000, code)
 
     vcd = VcdFile(avr, period=1000, filename='test.vcd')
     connect_pins_by_rule('''
@@ -78,6 +78,14 @@ def test_firmware():
     avr.terminate()
 
 
-if __name__ == '__main__':
+def parse_input_table(file_name):
+    with open(file_name) as f:
+        input_table = [tuple(i.split()) for i in f]
 
-    test_firmware()
+
+    return input_table
+
+
+if __name__ == '__main__':
+    table = parse_input_table('atmega328')
+    test_avr()
