@@ -9,18 +9,22 @@ class PythonModule {
 
   companion object {
 
-    const val path = "./app/src/emulator/backend/"
+    const val path = "backend-sim-core/"
 
     fun initTable(chosenMCU: MCU) {
-      val pins = chosenMCU.getPins()
+      val pins = chosenMCU.getPins().filter { it.value != null }
       val mcuName = chosenMCU.getName()
 
       if (File(path + mcuName).isFile) {
         File(path + mcuName).delete()
       }
 
-      pins.forEach {
-        File(path + mcuName).appendText("${it.name} ${it.value}\n")
+      val pinsTable = pins
+        .filter { it.name[1].isDigit() }
+        .map { it.name to it.value }
+
+      pinsTable.forEach {
+        File(path + mcuName).appendText("${it.first} ${it.second}\n")
       }
     }
 
@@ -28,11 +32,14 @@ class PythonModule {
       val mcuName = chosenMCU.getName()
 
       if (File(path + mcuName).isFile) {
-        Executor.INSTANCE = Runtime.getRuntime().exec("python2.7 ${path}sim.py $mcuName")
-
+        Executor.INSTANCE = Runtime.getRuntime().exec("python2.7 " + path + "sim.py " + mcuName)
       }
     }
 
     fun isProcAlive() = Executor.INSTANCE?.isAlive ?: false
+
+    fun stopExec() {
+      Executor.INSTANCE?.destroy()
+    }
   }
 }
