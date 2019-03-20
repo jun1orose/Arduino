@@ -38,7 +38,7 @@ class MCU(private val name: String, val width: Int) {
     for (i in pinNames.size / 2 - 1 downTo  0) {
       val y = pos.y + (i + 1) * dy - dy / 2
       CircuitComponent.addPin(Pin(Point(x, y), pinDiam))
-      mcu.addPin(pinNames[i], Point(x, y))
+      mcu.addPin(pinNames[pinNames.size - 1 - i], Point(x, y))
 
       gr2.color = Color.BLACK
       gr2.drawString(pinNames[pinNames.size - 1 - i], x - pinDiam - pinNames[pinNames.size - 1 - i].length * 6, y + dy / 4)
