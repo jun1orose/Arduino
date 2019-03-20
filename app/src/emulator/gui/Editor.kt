@@ -1,5 +1,6 @@
 package emulator.gui
 
+import emulator.backend.PythonModule
 import java.awt.BorderLayout
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
@@ -42,6 +43,15 @@ class Editor private constructor(): JFrame() {
     val debugButton = JButton("Debug")
     debugButton.addActionListener { val debugInfo = DebugInfo(this@Editor) }
     panel.add(debugButton)
+
+    val tempUploadFirmwareButton = JButton("Upload firmware")
+    tempUploadFirmwareButton.addActionListener {
+      val mcu = CircuitComponent.getMCU().getCore()
+      PythonModule.initTable(mcu)
+      PythonModule.execSim(mcu)
+    }
+    panel.add(tempUploadFirmwareButton)
+
     contentPane.add(panel, BorderLayout.PAGE_START)
   }
 
