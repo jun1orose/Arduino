@@ -45,10 +45,14 @@ class Editor private constructor(): JFrame() {
     panel.add(debugButton)
 
     val tempUploadFirmwareButton = JButton("Upload firmware")
+
     tempUploadFirmwareButton.addActionListener {
-      val mcu = CircuitComponent.getMCU().getCore()
-      PythonModule.initTable(mcu)
-      PythonModule.execSim(mcu)
+      if(!PythonModule.isProcAlive()) {
+        val mcu = CircuitComponent.getMCU().getCore()
+
+        PythonModule.initTable(mcu)
+        PythonModule.execSim(mcu)
+      }
     }
     panel.add(tempUploadFirmwareButton)
 
