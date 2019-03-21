@@ -23,8 +23,6 @@
 
 package processing.app;
 
-import cc.arduino.view.Event;
-
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import java.awt.*;
@@ -43,14 +41,14 @@ public class EditorToolbar extends JComponent implements MouseInputListener, Key
    * Rollover titles for each button.
    */
   private static final String[] title = {
-    tr("Verify"), tr("Upload"), tr("New"), tr("Open"), tr("Save"), tr("Serial Monitor"), tr("Emulator")
+    tr("Verify"), tr("Upload"), tr("New"), tr("Open"), tr("Save"), tr("Serial Monitor"), tr("Simulator"), tr("Export to simulator")
   };
 
   /**
    * Titles for each button when the shift key is pressed.
    */
   private static final String[] titleShift = {
-    tr("Verify"), tr("Upload Using Programmer"), tr("New"), tr("Open"), tr("Save As..."), tr("Serial Monitor"), tr("Emulator")
+    tr("Verify"), tr("Upload Using Programmer"), tr("New"), tr("Open"), tr("Save As..."), tr("Serial Monitor"), tr("Export to simulator")
   };
 
   private static final int BUTTON_COUNT = title.length;
@@ -80,7 +78,9 @@ public class EditorToolbar extends JComponent implements MouseInputListener, Key
   private static final int SAVE = 4;
 
   private static final int SERIAL = 5;
-  private static final int EMULATOR = 6;
+  private static final int SIMULATOR = 6;
+  private static final int EXPORT_TO_SIM = 7;
+
 
   private static final int INACTIVE = 0;
   private static final int ROLLOVER = 1;
@@ -129,7 +129,8 @@ public class EditorToolbar extends JComponent implements MouseInputListener, Key
     which[buttonCount++] = OPEN;
     which[buttonCount++] = SAVE;
     which[buttonCount++] = SERIAL;
-    which[buttonCount++] = EMULATOR;
+    which[buttonCount++] = SIMULATOR;
+    which[buttonCount++] = EXPORT_TO_SIM;
 
     currentRollover = -1;
 
@@ -144,11 +145,11 @@ public class EditorToolbar extends JComponent implements MouseInputListener, Key
 
   private void loadButtons() {
     Image allButtons = Theme.getThemeImage("buttons", this,
-                                           BUTTON_IMAGE_SIZE * BUTTON_COUNT,
+                                           BUTTON_IMAGE_SIZE * (BUTTON_COUNT - 1),
                                            BUTTON_IMAGE_SIZE * 3);
     buttonImages = new Image[BUTTON_COUNT][3];
 
-    for (int i = 0; i < BUTTON_COUNT; i++) {
+    for (int i = 0; i < BUTTON_COUNT - 1; i++) {
       for (int state = 0; state < 3; state++) {
         Image image = createImage(BUTTON_WIDTH, BUTTON_HEIGHT);
         Graphics g = image.getGraphics();
@@ -159,6 +160,17 @@ public class EditorToolbar extends JComponent implements MouseInputListener, Key
                     (-2 + state) * BUTTON_IMAGE_SIZE, null);
         buttonImages[i][state] = image;
       }
+    }
+
+    for (int state = 0; state < 3; state++) {
+      Image image = createImage(BUTTON_WIDTH, BUTTON_HEIGHT);
+      Graphics g = image.getGraphics();
+      g.setColor(bgcolor);
+      g.fillRect(0, 0, BUTTON_WIDTH, BUTTON_HEIGHT);
+      int offset = (BUTTON_IMAGE_SIZE - BUTTON_WIDTH) / 2;
+      g.drawImage(allButtons, - BUTTON_IMAGE_SIZE - offset,
+        (-2 + state) * BUTTON_IMAGE_SIZE, null);
+      buttonImages[BUTTON_COUNT - 1][state] = image;
     }
   }
 
@@ -192,7 +204,7 @@ public class EditorToolbar extends JComponent implements MouseInputListener, Key
       int offsetX = 3;
       for (int i = 0; i < buttonCount; i++) {
         x1[i] = offsetX;
-        if (i == 2 || i == 6) x1[i] += BUTTON_GAP;
+        if (i == 2) x1[i] += BUTTON_GAP;
         x2[i] = x1[i] + BUTTON_WIDTH;
         offsetX = x2[i];
       }
@@ -200,8 +212,10 @@ public class EditorToolbar extends JComponent implements MouseInputListener, Key
       // Serial button must be on the right
       x1[SERIAL] = width - BUTTON_WIDTH - 14;
       x2[SERIAL] = width - 14;
-      x1[EMULATOR] = width - BUTTON_WIDTH - 14 - BUTTON_GAP - BUTTON_WIDTH;
-      x2[EMULATOR] = width - BUTTON_WIDTH - 14 - BUTTON_GAP;
+      x1[SIMULATOR] = width - BUTTON_WIDTH - 14  - BUTTON_WIDTH;
+      x2[SIMULATOR] = width - BUTTON_WIDTH - 14;
+      x1[EXPORT_TO_SIM] = width - BUTTON_WIDTH - 14 - 2 * BUTTON_WIDTH;
+      x2[EXPORT_TO_SIM] = width  - 14 - 2 * BUTTON_WIDTH;
     }
     Graphics2D g = Theme.setupGraphics2D(offscreen.getGraphics());
     g.setColor(bgcolor); //getBackground());
@@ -228,10 +242,10 @@ public class EditorToolbar extends JComponent implements MouseInputListener, Key
     if (currentRollover != -1) {
       int statusY = (BUTTON_HEIGHT + g.getFontMetrics().getAscent()) / 2;
       String status = shiftPressed ? titleShift[currentRollover] : title[currentRollover];
-      if (currentRollover != SERIAL && currentRollover != EMULATOR)
-        g.drawString(status, (buttonCount - 2) * BUTTON_WIDTH + 3 * BUTTON_GAP, statusY);
+      if (currentRollover != SERIAL && currentRollover != SIMULATOR && currentRollover != EXPORT_TO_SIM)
+        g.drawString(status, (buttonCount - 3) * BUTTON_WIDTH + 3 * BUTTON_GAP, statusY);
       else {
-        int statusX = x1[EMULATOR] - BUTTON_GAP;
+        int statusX = x1[EXPORT_TO_SIM] - BUTTON_GAP;
         statusX -= g.getFontMetrics().stringWidth(status);
         g.drawString(status, statusX, statusY);
       }
@@ -389,8 +403,16 @@ public class EditorToolbar extends JComponent implements MouseInputListener, Key
         editor.handleSerial();
         break;
 
-      case EMULATOR:
-        editor.base.handleEmulator();
+      case SIMULATOR:
+        editor.handleSimulator();
+        break;
+
+      case EXPORT_TO_SIM:
+        if (!editor.avoidMultipleOperations) {
+          editor.handleRun(false, editor.presentHandler, editor.runHandler);
+          editor.avoidMultipleOperations = true;
+        }
+        editor.handleUploadToSimulator();
         break;
 
       default:

@@ -42,7 +42,6 @@ import cc.arduino.view.Event;
 import cc.arduino.view.JMenuUtils;
 import cc.arduino.view.SplashScreenHelper;
 import com.github.zafarkhaja.semver.Version;
-import emulator.gui.EmulatorBase;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import processing.app.debug.TargetBoard;
@@ -2374,10 +2373,5 @@ public class Base {
 
   public List<JMenuItem> getRecentSketchesMenuItems() {
     return recentSketchesMenuItems;
-  }
-
-  // behavior for Emulator button
-  public void handleEmulator() {
-    EmulatorBase.Companion.createEmulatorEditor();
   }
 }

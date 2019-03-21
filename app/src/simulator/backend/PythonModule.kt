@@ -12,6 +12,7 @@ class PythonModule {
     const val path = "backend-sim-core/"
 
     fun initTable(chosenMCU: MCU) {
+
       val pins = chosenMCU.getPins().filter { it.value != null }
       val mcuName = chosenMCU.getName()
 
@@ -21,10 +22,10 @@ class PythonModule {
 
       val pinsTable = pins
         .filter { it.name[1].isDigit() }
-        .map { it.name to it.value }
+        .map { Triple(it.name[0], it.name.substring(1), it.value) }
 
       pinsTable.forEach {
-        File(path + mcuName).appendText("${it.first} ${it.second}\n")
+        File(path + mcuName).appendText("${it.first} ${it.second} ${it.third}\n")
       }
     }
 
