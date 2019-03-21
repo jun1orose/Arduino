@@ -81,7 +81,7 @@ public class SketchTextAreaEditorKit extends RSyntaxTextAreaEditorKit {
       }
       try {
 
-        // We use the elements instead of calling getLineOfOffset(),
+        // We use the shapes instead of calling getLineOfOffset(),
         // etc. to speed things up just a tad (i.e. micro-optimize).
         Document document = textArea.getDocument();
         int caretPosition = textArea.getCaretPosition();

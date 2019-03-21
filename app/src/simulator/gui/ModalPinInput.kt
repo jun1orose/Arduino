@@ -1,6 +1,6 @@
-package emulator.gui
+package simulator.gui
 
-import emulator.core.Pin
+import simulator.core.Pin
 import java.awt.GridLayout
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener

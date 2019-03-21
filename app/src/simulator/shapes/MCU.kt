@@ -1,7 +1,7 @@
-package emulator.shapes
+package simulator.shapes
 
-import emulator.core.MCU
-import emulator.gui.CircuitComponent
+import simulator.core.MCU
+import simulator.gui.CircuitComponent
 import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.Point

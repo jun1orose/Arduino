@@ -1,6 +1,6 @@
-package emulator.gui
+package simulator.gui
 
-import emulator.backend.PythonModule
+import simulator.backend.PythonModule
 import java.awt.BorderLayout
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
@@ -18,7 +18,7 @@ class Editor private constructor(): JFrame() {
   }
 
   companion object {
-    fun createEmulator() {
+    fun createSimulator() {
       if (Holder.INSTANCE == null) {
         Holder.INSTANCE = Editor()
         Holder.INSTANCE?.isVisible = true

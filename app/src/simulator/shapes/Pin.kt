@@ -1,4 +1,4 @@
-package emulator.shapes
+package simulator.shapes
 
 import java.awt.Color
 import java.awt.Graphics2D

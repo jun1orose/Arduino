@@ -1,6 +1,6 @@
-package emulator.backend
+package simulator.backend
 
-import emulator.core.MCU
+import simulator.core.MCU
 import java.io.File
 
 class PythonModule {

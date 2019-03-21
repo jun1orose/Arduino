@@ -1,10 +1,14 @@
-package emulator.gui
+package simulator.gui
 
-class EmulatorBase  {
+class SimulatorBase  {
 
   companion object {
-    fun createEmulatorEditor() {
-      Editor.createEmulator()
+    fun createSimulatorEditor() {
+      Editor.createSimulator()
+    }
+
+    fun uploadFirmwareToBoard(buildPath: String, sketchName: String): String? {
+      return null
     }
   }
 

@@ -1,7 +1,7 @@
-package emulator.gui
+package simulator.gui
 
-import emulator.shapes.MCU
-import emulator.shapes.Pin
+import simulator.shapes.MCU
+import simulator.shapes.Pin
 import java.awt.*
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
