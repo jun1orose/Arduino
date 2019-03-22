@@ -13,13 +13,13 @@ class Editor private constructor(): JFrame() {
   private object Holder { var INSTANCE : Editor? = null }
 
   init {
-    initEmulatorUI("Emulator")
+    initSimulatorUI("Emulator")
     setCustomCloseOperation()
   }
 
   companion object {
     fun createSimulator() {
-      if (Holder.INSTANCE == null) {
+      if (!isSimulatorExist()) {
         Holder.INSTANCE = Editor()
         Holder.INSTANCE?.isVisible = true
         Holder.INSTANCE?.toFront()
@@ -29,9 +29,11 @@ class Editor private constructor(): JFrame() {
         Holder.INSTANCE?.toFront()
       }
     }
+
+    fun isSimulatorExist() = Holder.INSTANCE != null
   }
 
-  private fun initEmulatorUI(title: String) {
+  private fun initSimulatorUI(title: String) {
     setTitle(title)
     setSize(800, 800)
     setLocationRelativeTo(null)
@@ -51,7 +53,7 @@ class Editor private constructor(): JFrame() {
         val mcu = CircuitComponent.getMCU().getCore()
 
         PythonModule.initTable(mcu)
-        PythonModule.execSim(mcu)
+        PythonModule.uploadFirmwareAndRun(mcu)
       }
     }
     panel.add(tempUploadFirmwareButton)
