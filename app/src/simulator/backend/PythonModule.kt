@@ -29,11 +29,14 @@ class PythonModule {
       }
     }
 
-    fun execSim(chosenMCU: MCU) {
+    fun uploadFirmwareAndRun(chosenMCU: MCU, firmwareName: String = ""): String {
       val mcuName = chosenMCU.getName()
 
-      if (File(path + mcuName).isFile) {
-        Executor.INSTANCE = Runtime.getRuntime().exec("python2.7 " + path + "sim.py " + mcuName)
+      return if (File(path + mcuName).isFile) {
+        Executor.INSTANCE = Runtime.getRuntime().exec("python2.7 ${path}sim.py $mcuName $firmwareName")
+        "Successful uploading!"
+      } else {
+        "Error while uploading: input pin's table doesn't exist!"
       }
     }
 
