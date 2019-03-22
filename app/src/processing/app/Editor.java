@@ -2472,8 +2472,9 @@ public class Editor extends JFrame implements RunnerListener {
     File buildPath = null;
 
     try {
+      sketchController.build(false, false);
       buildPath = sketch.getBuildPath();
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
 
@@ -2482,10 +2483,8 @@ public class Editor extends JFrame implements RunnerListener {
         String path = buildPath.getAbsolutePath();
         String sketchName = sketch.getName();
 
-        String status = SimulatorBase.Companion.uploadFirmwareToBoard(path, sketchName);
-        if(status != null) {
-          this.status.notice(status);
-        }
+        String status = SimulatorBase.Companion.uploadAndRun(path, sketchName);
+        this.status.notice(status);
       }
     }
   }
