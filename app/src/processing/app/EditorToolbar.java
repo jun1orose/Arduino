@@ -408,10 +408,6 @@ public class EditorToolbar extends JComponent implements MouseInputListener, Key
         break;
 
       case EXPORT_TO_SIM:
-        if (!editor.avoidMultipleOperations) {
-          editor.handleRun(false, editor.presentHandler, editor.runHandler);
-          editor.avoidMultipleOperations = true;
-        }
         editor.handleUploadToSimulator();
         break;
 
