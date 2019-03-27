@@ -33,7 +33,19 @@ class PythonModule {
       val mcuName = chosenMCU.getName()
 
       return if (File(path + mcuName).isFile) {
-        Executor.INSTANCE = Runtime.getRuntime().exec("python2.7 ${path}sim.py $mcuName $firmwareName")
+        Executor.INSTANCE = Runtime.getRuntime().exec("python2.7 ${path}sim.py $path$mcuName $path$firmwareName")
+
+        /*
+        For testing purposes only
+
+        val exec = Executor.INSTANCE
+        val reader = BufferedReader(InputStreamReader(exec?.errorStream))
+        for(line in reader.lines()) {
+          System.out.println(line)
+        }
+
+        */
+
         "Successful uploading!"
       } else {
         "Error while uploading: input pin's table doesn't exist!"
