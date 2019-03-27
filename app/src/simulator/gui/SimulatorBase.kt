@@ -26,8 +26,8 @@ class SimulatorBase  {
         val firmwareDest = File("backend-sim-core/${firmwareSrc.name}")
         if (firmwareDest.exists()) {
           firmwareDest.delete()
-          firmwareSrc.copyTo(firmwareDest)
         }
+        firmwareSrc.copyTo(firmwareDest)
 
         val mcu = CircuitComponent.getMCU().getCore()
 
