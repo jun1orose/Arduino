@@ -1,104 +1,45 @@
-from mock import Mock
-from pyavrutils import AvrGcc
 from pysimavr.avr import Avr
-from pysimavr.connect import connect_pins_by_rule
 from pysimavr.firmware import Firmware
 from pysimavr.swig.simavr import avr_raise_irq
-from pysimavr.vcdfile import VcdFile
-import pysimavr.swig.utils as utils
 import sys
+import os
 
 
-def create_avr(mcu, f_cpu, code):
-    cc = AvrGcc(mcu=mcu)
-    cc.build(code)
-    fw = Firmware(cc.output)
-    return Avr(mcu=mcu, firmware=fw, f_cpu=f_cpu)
+class MCU:
 
+    def __init__(self, mcu_path, fw_path=None, freq=16000000):
+        self._parse_io_table(mcu_path)
+        self.mcu = os.path.basename(mcu_path)
+        self.fw_path = fw_path
+        self.freq = freq
 
-def test_avr():
-    mcu = 'atmega328'
-    code = '''
-    #include <avr/io.h>
-    #include <util/delay.h>
+        self._init_avr()
 
-    int main(void)
-    {  
-        DDRB = 0x00;
-        PORTB = 0xFF;
-        DDRC = 0x00;
-        PORTC = 0xFF;
-        
-        while(1)
-        {
-            PORTB = PINB;
-            PORTC = PINC;
-            _delay_ms(1000);
-        }
-    }
-    '''
+    def _parse_io_table(self, file_name):
+        with open(file_name) as f:
+            io_table = [tuple(line.split()) for line in f]
+            self.io_table = io_table
 
-    avr = create_avr(mcu, 16000000, code)
-    table = parse_input_table(mcu)
+    def _init_avr(self):
+        fw = Firmware(self.fw_path)
+        self._avr = Avr(mcu=self.mcu, firmware=fw, f_cpu=self.freq)
 
-    vcd = VcdFile(avr, period=1000, filename='test.vcd')
-    connect_pins_by_rule('''
-                                        avr.B8 ==> vcd
-                                        avr.B1 ==> vcd
-                                        avr.B2 ==> vcd
-                                        avr.B3 ==> vcd
-                                        avr.B4 ==> vcd
-                                        avr.B5 ==> vcd
-                                        avr.B6 ==> vcd
-                                        avr.B7 ==> vcd
-                                        
-                                        avr.C0 ==> vcd
-                                        avr.C1 ==> vcd
-                                        avr.C2 ==> vcd
-                                        avr.C3 ==> vcd
-                                        avr.C4 ==> vcd
-                                        avr.C5 ==> vcd
-                                        avr.C6 ==> vcd
-                                        avr.C7 ==> vcd
-                                        ''',
-                         dict(
-                             avr=avr,
-                         ),
-                         vcd=vcd,
-                         )
-    vcd.start()
+    def _submit_values_to_pins(self, pins):
+        for pin in pins:
+            avr_raise_irq(self._avr.irq.getioport((pin[0], int(pin[1]))), int(pin[2]))
 
-    def port_callback(irq, new_val):
-        print irq.name, new_val
+    def run(self):
+        self._submit_values_to_pins(self.io_table)
+        self._avr.run()
 
-    callback_mock = Mock(side_effect=port_callback)
+    def terminate(self):
+        self._avr.terminate()
 
-    avr.irq.ioport_register_notify(callback_mock, ('B', 8))
-    avr.irq.ioport_register_notify(callback_mock, ('C', 8))
-
-    avr.step(20000000)
-    submit_values_to_pins(table, avr)
-
-    n = 90000000
-    while n > 0:
-        i = 10000000
-        avr.step(i)
-        n -= i
-
-    avr.terminate()
-
-
-def parse_input_table(file_name):
-    with open(file_name) as f:
-        input_table = [tuple(line.split()) for line in f]
-
-    return input_table
-
-
-def submit_values_to_pins(pins, avr):
-    for pin in pins:
-        avr_raise_irq(avr.irq.getioport((pin[0], int(pin[1]))), int(pin[2]))
+    def step(self, n=1):
+        self._avr.step(n)
 
 
 if __name__ == '__main__':
-    test_avr()
+    avr = MCU(sys.argv[1], sys.argv[2])
+    avr.step(4000000)
+    avr.terminate()
