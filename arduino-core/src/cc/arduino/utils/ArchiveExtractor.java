@@ -73,7 +73,7 @@ public class ArchiveExtractor {
    *
    * @param archiveFile Archive file to extract
    * @param destFolder  Destination folder
-   * @param stripPath   Number of path elements to strip from the paths contained in the
+   * @param stripPath   Number of path shapes to strip from the paths contained in the
    *                    archived files
    * @throws IOException
    */

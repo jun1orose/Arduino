@@ -21,44 +21,6 @@
 
 package processing.app;
 
-import static processing.app.I18n.format;
-import static processing.app.I18n.tr;
-
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.MediaTracker;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.SystemColor;
-import java.awt.Toolkit;
-import java.awt.font.TextAttribute;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TreeMap;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
-import javax.swing.text.StyleContext;
-
 import org.apache.batik.transcoder.Transcoder;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
@@ -69,6 +31,21 @@ import org.apache.commons.lang3.StringUtils;
 import processing.app.helpers.OSUtils;
 import processing.app.helpers.PreferencesHelper;
 import processing.app.helpers.PreferencesMap;
+
+import javax.swing.text.StyleContext;
+import java.awt.*;
+import java.awt.font.TextAttribute;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
+import static processing.app.I18n.format;
+import static processing.app.I18n.tr;
 
 /**
  * Storage class for theme settings. This was separated from the Preferences
@@ -324,7 +301,7 @@ public class Theme {
   static private final Map<String, ZippedTheme> availableThemes = new TreeMap<>();
   
   /**
-   * Zip file containing user-defined theme elements 
+   * Zip file containing user-defined theme shapes
    */
   static private ZippedTheme zipTheme;
   

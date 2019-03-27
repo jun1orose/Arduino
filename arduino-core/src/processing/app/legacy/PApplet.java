@@ -214,7 +214,7 @@ public class PApplet {
   }
 
   /**
-   * Make an array of int elements from an array of String objects.
+   * Make an array of int shapes from an array of String objects.
    * If the String can't be parsed as a number, it will be set to zero.
    *
    * String s[] = { "1", "300", "44" };
@@ -227,7 +227,7 @@ public class PApplet {
   }
 
   /**
-   * Make an array of int elements from an array of String objects.
+   * Make an array of int shapes from an array of String objects.
    * If the String can't be parsed as a number, its entry in the
    * array will be set to the value of the "missing" parameter.
    *
@@ -381,7 +381,7 @@ public class PApplet {
 
   /**
    * Launch a process using a platforms shell. This version uses an array
-   * to make it easier to deal with spaces in the individual elements.
+   * to make it easier to deal with spaces in the individual shapes.
    * (This avoids the situation of trying to put single or double quotes
    * around different bits).
    *
@@ -487,7 +487,7 @@ public class PApplet {
   
   /**
    * Match a string with a regular expression, and returns the match as an
-   * array. The first index is the matching expression, and array elements
+   * array. The first index is the matching expression, and array shapes
    * [1] and higher represent each of the groups (sequences found in parens).
    *
    * This uses multiline matching (Pattern.MULTILINE) and dotall mode

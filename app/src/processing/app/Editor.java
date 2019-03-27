@@ -22,24 +22,34 @@
 
 package processing.app;
 
-import static processing.app.I18n.tr;
-import static processing.app.Theme.scale;
+import cc.arduino.CompilerProgressListener;
+import cc.arduino.packages.BoardPort;
+import cc.arduino.packages.MonitorFactory;
+import cc.arduino.packages.Uploader;
+import cc.arduino.packages.uploaders.SerialUploader;
+import cc.arduino.view.GoToLineNumber;
+import cc.arduino.view.StubMenuListener;
+import cc.arduino.view.findreplace.FindReplace;
+import com.jcraft.jsch.JSchException;
+import simulator.gui.SimulatorBase;
+import jssc.SerialPortException;
+import processing.app.debug.RunnerException;
+import processing.app.forms.PasswordAuthorizationDialog;
+import processing.app.helpers.*;
+import processing.app.legacy.PApplet;
+import processing.app.syntax.PdeKeywords;
+import processing.app.syntax.SketchTextArea;
+import processing.app.tools.MenuScroller;
+import processing.app.tools.Tool;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
+import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import javax.swing.text.BadLocationException;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
@@ -50,62 +60,14 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import javax.swing.AbstractAction;
-import javax.swing.Box;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.TransferHandler;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-import javax.swing.text.BadLocationException;
-
-import com.jcraft.jsch.JSchException;
-
-import cc.arduino.CompilerProgressListener;
-import cc.arduino.packages.BoardPort;
-import cc.arduino.packages.MonitorFactory;
-import cc.arduino.packages.Uploader;
-import cc.arduino.packages.uploaders.SerialUploader;
-import cc.arduino.view.GoToLineNumber;
-import cc.arduino.view.StubMenuListener;
-import cc.arduino.view.findreplace.FindReplace;
-import jssc.SerialPortException;
-import processing.app.debug.RunnerException;
-import processing.app.forms.PasswordAuthorizationDialog;
-import processing.app.helpers.DocumentTextChangeListener;
-import processing.app.helpers.Keys;
-import processing.app.helpers.OSUtils;
-import processing.app.helpers.PreferencesMapException;
-import processing.app.helpers.StringReplacer;
-import processing.app.legacy.PApplet;
-import processing.app.syntax.PdeKeywords;
-import processing.app.syntax.SketchTextArea;
-import processing.app.tools.MenuScroller;
-import processing.app.tools.Tool;
+import static processing.app.I18n.tr;
+import static processing.app.Theme.scale;
 
 /**
  * Main editor panel for the Processing Development Environment.
@@ -2500,6 +2462,32 @@ public class Editor extends JFrame implements RunnerListener {
     //printerJob = null;  // clear this out?
   }
 
+  // behavior for Simulator button
+  public void handleSimulator() {
+    SimulatorBase.Companion.createSimulatorEditor();
+  }
+
+  // behavior for Upload to simulator
+  public void handleUploadToSimulator() {
+    File buildPath = null;
+
+    try {
+      sketchController.build(false, false);
+      buildPath = sketch.getBuildPath();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    if(buildPath != null) {
+      if(buildPath.listFiles() != null && Objects.requireNonNull(buildPath.listFiles()).length != 0) {
+        String path = buildPath.getAbsolutePath();
+        String sketchName = sketch.getName();
+
+        String status = SimulatorBase.Companion.uploadAndRun(path, sketchName);
+        this.status.notice(status);
+      }
+    }
+  }
 
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
