@@ -628,6 +628,10 @@
       <fileset refid="runtime.jars" />
     </copy>
 
+    <copy todir="linux/work/lib">
+      <fileset dir="${user.home}/.sdkman/candidates/kotlin/current/lib"/>
+    </copy>
+
     <antcall target="assemble">
       <param name="target.path" value="linux/work" />
     </antcall>
