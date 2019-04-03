@@ -23,7 +23,8 @@ class SimulatorBase  {
           return "$sketchName.ino.elf doesn't exist!"
         }
 
-        val firmwareDest = File("backend-sim-core/${firmwareSrc.name}")
+        val path = PythonModule.getPath()
+        val firmwareDest = File(path + firmwareSrc.name)
         if (firmwareDest.exists()) {
           firmwareDest.delete()
         }
@@ -39,6 +40,15 @@ class SimulatorBase  {
       } catch (e: Exception) {
         e.printStackTrace()
         return "Upload error!"
+      }
+    }
+
+    fun deleteTempFiles() {
+      val fileList = File(PythonModule.getPath()).listFiles()
+      for(file in fileList) {
+        if(file.name != "sim.py" && file.name != "backend-sim-core.iml") {
+          file.delete()
+        }
       }
     }
   }
