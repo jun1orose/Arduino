@@ -60,6 +60,7 @@ import processing.app.syntax.PdeKeywords;
 import processing.app.syntax.SketchTextAreaDefaultInputMap;
 import processing.app.tools.MenuScroller;
 import processing.app.tools.ZipDeflater;
+import simulator.gui.SimulatorBase;
 
 import javax.swing.*;
 import java.awt.*;
@@ -946,6 +947,9 @@ public class Base {
       // Save out the current prefs state
       PreferencesData.save();
 
+      // Delete temp files for simulator
+      SimulatorBase.Companion.deleteTempFiles();
+
       // Since this wasn't an actual Quit event, call System.exit()
       System.exit(0);
 
@@ -995,6 +999,10 @@ public class Base {
         // then Mac OS X will send the terminate signal itself.
         System.exit(0);
       }
+
+      // Delete temp files for simulator
+      SimulatorBase.Companion.deleteTempFiles();
+
       return true;
     }
     return false;
