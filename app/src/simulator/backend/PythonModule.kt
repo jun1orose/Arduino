@@ -6,18 +6,17 @@ import java.io.File
 class PythonModule {
 
   private object Executor { var INSTANCE: Process? = null}
+  private object Path { const val INSTANCE = "backend-sim-core/"}
 
   companion object {
-
-    const val path = "backend-sim-core/"
 
     fun initTable(chosenMCU: MCU) {
 
       val pins = chosenMCU.getPins().filter { it.value != null }
       val mcuName = chosenMCU.getName()
 
-      if (File(path + mcuName).isFile) {
-        File(path + mcuName).delete()
+      if (File(Path.INSTANCE + mcuName).isFile) {
+        File(Path.INSTANCE + mcuName).delete()
       }
 
       val pinsTable = pins
@@ -25,15 +24,16 @@ class PythonModule {
         .map { Triple(it.name[0], it.name.substring(1), it.value) }
 
       pinsTable.forEach {
-        File(path + mcuName).appendText("${it.first} ${it.second} ${it.third}\n")
+        File(Path.INSTANCE + mcuName).appendText("${it.first} ${it.second} ${it.third}\n")
       }
     }
 
     fun uploadFirmwareAndRun(chosenMCU: MCU, firmwareName: String = ""): String {
       val mcuName = chosenMCU.getName()
 
-      return if (File(path + mcuName).isFile) {
-        Executor.INSTANCE = Runtime.getRuntime().exec("python2.7 ${path}sim.py $path$mcuName $path$firmwareName")
+      return if (File(Path.INSTANCE + mcuName).isFile) {
+        Executor.INSTANCE = Runtime.getRuntime().exec("python2.7 ${Path.INSTANCE}sim.py " +
+          "${Path.INSTANCE}$mcuName ${Path.INSTANCE}$firmwareName")
 
         /*
         For testing purposes only
@@ -57,5 +57,7 @@ class PythonModule {
     fun stopExec() {
       Executor.INSTANCE?.destroy()
     }
+
+    fun getPath() = Path.INSTANCE
   }
 }
