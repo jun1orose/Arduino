@@ -587,6 +587,7 @@
 
   <target name="linux-clean" depends="subprojects-clean" description="Clean linux version">
     <delete dir="linux/work" />
+    <delete dir="backend-sim-core" />
     <delete>
       <fileset dir="linux" includes="arduino-*linux*.tar.xz"/>
     </delete>
@@ -610,6 +611,7 @@
   <target name="linux-build" depends="revision-check, linux-checkos, subprojects-build" description="Build linux version">
     <mkdir dir="linux/work" />
     <mkdir dir="linux/work/${staging_hardware_folder}" />
+    <mkdir dir="backend-sim-core" />
 
     <copy todir="linux/work">
       <fileset dir="shared" includes="lib/**" />
@@ -630,6 +632,10 @@
 
     <copy todir="linux/work/lib">
       <fileset dir="${user.home}/.sdkman/candidates/kotlin/current/lib"/>
+    </copy>
+
+    <copy todir="backend-sim-core">
+      <fileset dir="../backend-sim-core/"/>
     </copy>
 
     <antcall target="assemble">
