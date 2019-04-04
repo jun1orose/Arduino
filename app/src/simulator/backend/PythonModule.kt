@@ -1,6 +1,6 @@
 package simulator.backend
 
-import simulator.core.MCU
+import simulator.model.core.MCU
 import java.io.File
 
 class PythonModule {
@@ -12,7 +12,7 @@ class PythonModule {
 
     fun initTable(chosenMCU: MCU) {
 
-      val pins = chosenMCU.getPins().filter { it.value != null }
+      val pins = chosenMCU.getPins().filter { it.getValue() != null }
       val mcuName = chosenMCU.getName()
 
       if (File(Path.INSTANCE + mcuName).isFile) {
@@ -21,7 +21,7 @@ class PythonModule {
 
       val pinsTable = pins
         .filter { it.name[1].isDigit() }
-        .map { Triple(it.name[0], it.name.substring(1), it.value) }
+        .map { Triple(it.name[0], it.name.substring(1), it.getValue()) }
 
       pinsTable.forEach {
         File(Path.INSTANCE + mcuName).appendText("${it.first} ${it.second} ${it.third}\n")

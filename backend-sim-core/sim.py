@@ -3,6 +3,7 @@ from pysimavr.firmware import Firmware
 from pysimavr.swig.simavr import avr_raise_irq
 import sys
 import os
+import zmq
 
 
 class MCU:
@@ -37,6 +38,13 @@ class MCU:
 
     def step(self, n=1):
         self._avr.step(n)
+
+
+def init_socket():
+    port = 5555
+    context = zmq.Context()
+    socket = context.socket(zmq.PAIR)
+    socket.connect("tcp://*:%s" % port)
 
 
 if __name__ == '__main__':

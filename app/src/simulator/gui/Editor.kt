@@ -43,7 +43,7 @@ class Editor private constructor(): JFrame() {
 
     val panel = JPanel()
     val debugButton = JButton("Debug")
-    debugButton.addActionListener { val debugInfo = DebugInfo(this@Editor) }
+    debugButton.addActionListener { DebugInfo(this@Editor) }
     panel.add(debugButton)
 
     val tempUploadFirmwareButton = JButton("Upload firmware")

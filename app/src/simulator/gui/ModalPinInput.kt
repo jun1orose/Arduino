@@ -1,6 +1,6 @@
 package simulator.gui
 
-import simulator.core.Pin
+import simulator.model.core.Pin
 import java.awt.GridLayout
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
@@ -18,7 +18,7 @@ class ModalPinInput(chosenPin: Pin, parentWindow: JFrame): JDialog(parentWindow,
 
     val text = JLabel("Binary pin value: ")
     val inputField = JTextField()
-    inputField.text = chosenPin.value?.toString() ?: "empty"
+    inputField.text = chosenPin.getValue()?.toString() ?: "empty"
 
     inputField.setSize(20, 10)
     this.layout = GridLayout(1, 2)
@@ -30,7 +30,7 @@ class ModalPinInput(chosenPin: Pin, parentWindow: JFrame): JDialog(parentWindow,
 
       override fun keyPressed(p0: KeyEvent?) {
         if(p0?.keyCode == KeyEvent.VK_ENTER) {
-          chosenPin.value = getInputFromField(inputField)
+          chosenPin.setValue(getInputFromField(inputField))
           dispatchEvent(WindowEvent(this@ModalPinInput, WindowEvent.WINDOW_CLOSING))
           dispose()
         }

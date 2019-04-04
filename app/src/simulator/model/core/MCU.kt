@@ -1,4 +1,4 @@
-package simulator.core
+package simulator.model.core
 
 import java.awt.Point
 
