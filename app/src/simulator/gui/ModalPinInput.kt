@@ -6,15 +6,14 @@ import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 import java.awt.event.WindowEvent
 import javax.swing.JDialog
-import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JTextField
 
-class ModalPinInput(chosenPin: Pin, parentWindow: JFrame): JDialog(parentWindow, true) {
+class ModalPinInput(chosenPin: Pin, editor: Editor): JDialog(editor, true) {
   init {
     this.title = "Input"
     setSize(200, 100)
-    setLocationRelativeTo(parentWindow)
+    setLocationRelativeTo(editor)
 
     val text = JLabel("Binary pin value: ")
     val inputField = JTextField()
@@ -30,7 +29,7 @@ class ModalPinInput(chosenPin: Pin, parentWindow: JFrame): JDialog(parentWindow,
 
       override fun keyPressed(p0: KeyEvent?) {
         if(p0?.keyCode == KeyEvent.VK_ENTER) {
-          chosenPin.setValue(getInputFromField(inputField))
+          editor.model.changePinValue(chosenPin, getInputFromField(inputField))
           dispatchEvent(WindowEvent(this@ModalPinInput, WindowEvent.WINDOW_CLOSING))
           dispose()
         }

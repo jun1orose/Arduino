@@ -1,6 +1,6 @@
 package simulator.gui
 
-import simulator.backend.PythonModule
+import simulator.model.Model
 import java.awt.BorderLayout
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
@@ -11,6 +11,7 @@ import javax.swing.JPanel
 class Editor private constructor(): JFrame() {
 
   private object Holder { var INSTANCE : Editor? = null }
+  val model = Model()
 
   init {
     initSimulatorUI("Emulator")
@@ -31,6 +32,8 @@ class Editor private constructor(): JFrame() {
     }
 
     fun isSimulatorExist() = Holder.INSTANCE != null
+
+    fun returnEditor() = Holder.INSTANCE
   }
 
   private fun initSimulatorUI(title: String) {
@@ -45,18 +48,6 @@ class Editor private constructor(): JFrame() {
     val debugButton = JButton("Debug")
     debugButton.addActionListener { DebugInfo(this@Editor) }
     panel.add(debugButton)
-
-    val tempUploadFirmwareButton = JButton("Upload firmware")
-
-    tempUploadFirmwareButton.addActionListener {
-      if(!PythonModule.isProcAlive()) {
-        val mcu = CircuitComponent.getMCU().getCore()
-
-        PythonModule.initTable(mcu)
-        PythonModule.uploadFirmwareAndRun(mcu)
-      }
-    }
-    panel.add(tempUploadFirmwareButton)
 
     contentPane.add(panel, BorderLayout.PAGE_START)
   }

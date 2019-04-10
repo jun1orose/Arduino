@@ -2,11 +2,12 @@ package simulator.model
 
 import simulator.model.core.MCU
 import simulator.model.core.Pin
+import java.awt.Point
 
 class Model {
 
-  private val pins = mutableListOf<Pin>()
-  private val MCUs = mutableListOf<MCU>()
+  private val pins = mutableSetOf<Pin>()
+  private val controllers = mutableSetOf<MCU>()
   private val socket = Socket()
 
   fun changePinValue(pin: Pin, newValue: Int) {
@@ -24,4 +25,29 @@ class Model {
       socket.sendMsg(newMsg)
     }
   }
+
+  fun getPins() = this.pins
+
+  fun addPin(pinName: String, pinValue: Int? = null, pinPos: Point, relativeElement: String) {
+
+    val relElem = getMCU(relativeElement)
+    relElem?.addPin(pinName, pinPos)
+
+    pins.find { it.name == pinName}?.apply {
+      this.pos = pinPos
+      return
+    }
+
+    this.pins.add(Pin(pinName, pinValue, pinPos, relativeElement))
+  }
+
+  fun clearPins() {
+    pins.clear()
+  }
+
+  fun addMCU(mcuName: String) {
+    controllers.add(MCU(mcuName))
+  }
+
+  fun getMCU(mcuName: String) = controllers.find { it.getName() == mcuName }
 }

@@ -7,23 +7,23 @@ import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import java.awt.image.BufferedImage
 import javax.swing.JComponent
-import javax.swing.JFrame
 
-class CircuitComponent(parentWindow: JFrame): JComponent() {
+class CircuitComponent(private val editor: Editor): JComponent() {
 
   private var buffer: BufferedImage? = null
   private var antiAlias = true
-  private object Pins { val INSTANCE = mutableListOf<Pin>() }
-  private object MCU { val INSTANCE = MCU("atmega328", 400)}
+
+  private val pins = mutableSetOf<Pin>()
+  private val controllers = mutableListOf<MCU>()
 
   init {
       this.addMouseListener(object : MouseListener {
         override fun mouseClicked(p0: MouseEvent) {
           val pos = Point(p0.x, p0.y)
-          for(pin in Pins.INSTANCE) {
+          for(pin in pins) {
             if (pin.isPin(pos)) {
-              getMCU().getCore().getPinByPos(pin.pos)?.apply {
-                ModalPinInput(this, parentWindow)
+              editor.model.getMCU("atmega328")?.getPinByPos(pin.pos)?.apply {
+                ModalPinInput(this, editor)
               }
             }
           }
@@ -38,7 +38,8 @@ class CircuitComponent(parentWindow: JFrame): JComponent() {
 
   override fun paintComponent(g: Graphics?) {
     super.paintComponent(g)
-    Pins.INSTANCE.clear()
+    pins.clear()
+    controllers.clear()
 
     val needsNewBuffer = buffer == null
         || width != buffer?.width
@@ -53,8 +54,11 @@ class CircuitComponent(parentWindow: JFrame): JComponent() {
       gr2.color = Color.WHITE
       gr2.fillRect(0, 0, width, height)
 
-      val startPoint = Point((width - getMCU().width) / 2, (height - getMCU().width) / 2)
-      getMCU().drawTo(gr2, startPoint)
+      val startPoint = Point((width - 400) / 2, (height - 400) / 2)
+      addMCU("atmega328", 400, startPoint)
+
+      controllers.forEach { it.drawTo(gr2) }
+      pins.forEach { it.drawTo(gr2) }
     }
 
     g?.drawImage(buffer, 0, 0, null)
@@ -69,13 +73,13 @@ class CircuitComponent(parentWindow: JFrame): JComponent() {
     }
   }
 
-  companion object {
-    fun addPin(pin: Pin) {
-      Pins.INSTANCE.add(pin)
-    }
+  fun addPin(pinName: String,  pinImage: Pin, relElem: String = "") {
+    pins.add(pinImage)
+    editor.model.addPin(pinName, pinPos = pinImage.pos, relativeElement = relElem)
+  }
 
-    fun getPins() = Pins.INSTANCE
-
-    fun getMCU() = MCU.INSTANCE
+  private fun addMCU(mcuName: String, mcuSize: Int, mcuPos: Point) {
+    controllers.add(MCU(mcuName, mcuSize, this@CircuitComponent, mcuPos))
+    editor.model.addMCU(mcuName)
   }
 }

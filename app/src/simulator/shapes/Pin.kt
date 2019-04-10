@@ -5,7 +5,7 @@ import java.awt.Graphics2D
 import java.awt.Point
 import java.awt.geom.Point2D
 
-class Pin(val pos: Point, private val rad: Int) {
+class Pin(var pos: Point, private val rad: Int) {
 
   fun drawTo(gr2: Graphics2D) {
     gr2.color = Color.blue

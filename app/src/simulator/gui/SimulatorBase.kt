@@ -30,10 +30,13 @@ class SimulatorBase  {
         }
         firmwareSrc.copyTo(firmwareDest)
 
-        val mcu = CircuitComponent.getMCU().getCore()
+        var status = "MCU's doesn't exist"
+        val mcu = Editor.returnEditor()?.model?.getMCU("atmega328")
 
-        PythonModule.initTable(mcu)
-        val status = PythonModule.uploadFirmwareAndRun(mcu, "$sketchName.ino.elf")
+        if(mcu != null) {
+          PythonModule.initTable(mcu)
+          status = PythonModule.uploadFirmwareAndRun(mcu, "$sketchName.ino.elf")
+        }
 
         return status
 
