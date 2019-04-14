@@ -22,7 +22,7 @@ class CircuitComponent(private val editor: Editor): JComponent() {
           val pos = Point(p0.x, p0.y)
           for(pin in pins) {
             if (pin.isPin(pos)) {
-              editor.model.getMCU("atmega328")?.getPinByPos(pin.pos)?.apply {
+              editor.getModel().getMCU("atmega328")?.getPinByPos(pin.pos)?.apply {
                 ModalPinInput(this, editor)
               }
             }
@@ -75,11 +75,11 @@ class CircuitComponent(private val editor: Editor): JComponent() {
 
   fun addPin(pinName: String,  pinImage: Pin, relElem: String = "") {
     pins.add(pinImage)
-    editor.model.addPin(pinName, pinPos = pinImage.pos, relativeElement = relElem)
+    editor.getModel().addPin(pinName, pinPos = pinImage.pos, relativeElement = relElem)
   }
 
   private fun addMCU(mcuName: String, mcuSize: Int, mcuPos: Point) {
     controllers.add(MCU(mcuName, mcuSize, this@CircuitComponent, mcuPos))
-    editor.model.addMCU(mcuName)
+    editor.getModel().addMCU(mcuName)
   }
 }

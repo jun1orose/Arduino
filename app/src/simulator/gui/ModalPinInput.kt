@@ -29,7 +29,7 @@ class ModalPinInput(chosenPin: Pin, editor: Editor): JDialog(editor, true) {
 
       override fun keyPressed(p0: KeyEvent?) {
         if(p0?.keyCode == KeyEvent.VK_ENTER) {
-          editor.model.changePinValue(chosenPin, getInputFromField(inputField))
+          editor.getModel().changePinValue(chosenPin, getInputFromField(inputField))
           dispatchEvent(WindowEvent(this@ModalPinInput, WindowEvent.WINDOW_CLOSING))
           dispose()
         }

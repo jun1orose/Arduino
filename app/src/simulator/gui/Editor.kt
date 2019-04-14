@@ -1,5 +1,6 @@
 package simulator.gui
 
+import simulator.backend.PythonModule
 import simulator.model.Model
 import java.awt.BorderLayout
 import java.awt.event.WindowAdapter
@@ -8,32 +9,16 @@ import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JPanel
 
-class Editor private constructor(): JFrame() {
+class Editor(val base: SimulatorBase): JFrame() {
 
-  private object Holder { var INSTANCE : Editor? = null }
-  val model = Model()
+  private val backend: PythonModule = PythonModule()
+  private val model: Model
 
   init {
+    this.model = Model(this.backend)
+
     initSimulatorUI("Emulator")
     setCustomCloseOperation()
-  }
-
-  companion object {
-    fun createSimulator() {
-      if (!isSimulatorExist()) {
-        Holder.INSTANCE = Editor()
-        Holder.INSTANCE?.isVisible = true
-        Holder.INSTANCE?.toFront()
-      }
-      else {
-        Holder.INSTANCE?.isVisible = true
-        Holder.INSTANCE?.toFront()
-      }
-    }
-
-    fun isSimulatorExist() = Holder.INSTANCE != null
-
-    fun returnEditor() = Holder.INSTANCE
   }
 
   private fun initSimulatorUI(title: String) {
@@ -50,6 +35,8 @@ class Editor private constructor(): JFrame() {
     panel.add(debugButton)
 
     contentPane.add(panel, BorderLayout.PAGE_START)
+
+    this@Editor.isVisible = true
   }
 
   private fun setCustomCloseOperation() {
@@ -58,10 +45,15 @@ class Editor private constructor(): JFrame() {
 
     this.addWindowListener(object : WindowAdapter() {
       override fun windowClosing(e: WindowEvent?) {
-        Holder.INSTANCE?.dispose()
-        Holder.INSTANCE = null
+        this@Editor.isVisible = false
+        this@Editor.dispose()
+        this@Editor.base.editor = null
+        this@Editor.backend.stopProcExec()
       }
     })
   }
 
+  fun getBackend() = this@Editor.backend
+
+  fun getModel() = this@Editor.model
 }

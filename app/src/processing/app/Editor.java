@@ -2462,9 +2462,10 @@ public class Editor extends JFrame implements RunnerListener {
     //printerJob = null;  // clear this out?
   }
 
+  private SimulatorBase simBase = new SimulatorBase();
   // behavior for Simulator button
   public void handleSimulator() {
-    SimulatorBase.Companion.createSimulatorEditor();
+    simBase.createSimulatorEditor();
   }
 
   // behavior for Upload to simulator
@@ -2480,10 +2481,8 @@ public class Editor extends JFrame implements RunnerListener {
 
     if(buildPath != null) {
       if(buildPath.listFiles() != null && Objects.requireNonNull(buildPath.listFiles()).length != 0) {
-        String path = buildPath.getAbsolutePath();
-        String sketchName = sketch.getName();
-
-        String status = SimulatorBase.Companion.uploadAndRun(path, sketchName);
+        String sketchPath = buildPath.getAbsolutePath() + "/" + sketch.getName() + ".ino.elf";
+        String status = simBase.uploadFirmware(sketchPath);
         this.status.notice(status);
       }
     }

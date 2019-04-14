@@ -27,6 +27,15 @@ class Socket: Thread() {
     }
   }
 
-  fun sendMsg(msg: String) = this.socket.send(msg)
+  fun sendMsg(msg: String): String {
+    return try {
+      this.socket.send(msg)
+      "Successful sanding!"
+    }
+    catch (e: Exception) {
+      e.printStackTrace()
+      "Another process does't bound"
+    }
+  }
 }
 

@@ -1,14 +1,14 @@
 package simulator.model
 
+import simulator.backend.PythonModule
 import simulator.model.core.MCU
 import simulator.model.core.Pin
 import java.awt.Point
 
-class Model {
+class Model(private val backend: PythonModule) {
 
   private val pins = mutableSetOf<Pin>()
   private val controllers = mutableSetOf<MCU>()
-  private val socket = Socket()
 
   fun changePinValue(pin: Pin, newValue: Int) {
     pin.setValue(newValue)
@@ -22,9 +22,11 @@ class Model {
   private fun notifyBackend(mcuName:String, pinName: String, newValue: Int) {
     if(pinName[1].isDigit()) {
       val newMsg = "$mcuName ${pinName[0]} ${pinName.substring(1)} $newValue"
-      socket.sendMsg(newMsg)
+      sendMsg(newMsg)
     }
   }
+
+  private fun sendMsg(msg: String) = backend.sendMsg(msg)
 
   fun getPins() = this.pins
 
