@@ -18,15 +18,10 @@ class Socket:
         self.socket.send_string(msg)
 
     def recv_msgs(self):
-        lock = Lock()
-
         while True:
             try:
                 msg = self.socket.recv(zmq.NOBLOCK)
-
-                lock.acquire()
                 self.msg_queue.put(msg)
-                lock.release()
 
             except ZMQError:
                 self.socket.RCVTIMEO = 10000 * 1
@@ -35,10 +30,7 @@ class Socket:
                 try:
                     msg = self.socket.recv()
                     self.socket.RCVTIMEO = -1
-
-                    lock.acquire()
                     self.msg_queue.put(msg)
-                    lock.release()
 
                 except ZMQError:
                     self.socket.close()
