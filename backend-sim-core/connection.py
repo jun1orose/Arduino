@@ -1,13 +1,13 @@
-
 from queue import Queue
 import zmq
 from zmq import ZMQError
 
 
 class Socket:
-    def __init__(self, port=5600):
+    def __init__(self, port=5555):
         self.port = port
         self.socket = None
+        self.msg_queue = Queue()
         self.context = zmq.Context()
 
     def init_socket(self):
@@ -17,15 +17,33 @@ class Socket:
     def send_msg(self, msg):
         self.socket.send_string(msg)
 
-    def recv_msgs(self, msg_queue):
-        # type: (Queue) -> None
+    def recv_msgs(self):
+        lock = Lock()
+
         while True:
-            if True:
+            try:
+                msg = self.socket.recv(zmq.NOBLOCK)
+
+                lock.acquire()
+                self.msg_queue.put(msg)
+                lock.release()
+
+            except ZMQError:
+                self.socket.RCVTIMEO = 10000 * 1
+                self.send_msg("check")
+
                 try:
-                    msg = self.socket.recv_string(zmq.NOBLOCK)
-                    msg_queue.put(msg)
+                    msg = self.socket.recv()
+                    self.socket.RCVTIMEO = -1
+
+                    lock.acquire()
+                    self.msg_queue.put(msg)
+                    lock.release()
+
                 except ZMQError:
-                    pass
-            else:
-                self.socket.close()
-                return
+                    self.socket.close()
+                    return
+
+
+
+
