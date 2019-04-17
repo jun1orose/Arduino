@@ -10,82 +10,94 @@ atmega_328_digit_pin_table = ['C6', 'D0', 'D1', 'D2', 'D3', 'D4', 'B6', 'B7', 'D
                               'C1', 'C2', 'C3', 'C4', 'C5']
 
 
-def upload_firmware(mcu, fw_path):
-    # type: (Avr, str) -> None
+class Controller:
 
-    fw = Firmware(fw_path)
-    mcu.load_firmware(fw)
+    def __init__(self, sock, mcu_name, freq=16000000):
+        self.mcu_name = mcu_name
+        self.mcu = Avr(mcu=mcu_name, f_cpu=freq)
+        self.bind_callback_for_digit_pins(atmega_328_digit_pin_table)
+        self.socket = sock
 
+    def upload_firmware(self, fw_path):
+        fw = Firmware(fw_path)
+        self.mcu.load_firmware(fw)
 
-def submit_value_to_pin(mcu, pin):
-    # type: (Avr, str) -> None
+    def bind_callback_for_digit_pins(self, ports):
 
-    avr_raise_irq(mcu.irq.getioport((pin[0], int(pin[1]))), int(pin[2]))
+        def port_callback(irq, new_val):
+            msg = self.mcu_name + " change " + irq.name[0] + " " + irq.name[1] + " " + str(new_val)
+            self.socket.send_msg(msg)
 
+        callback = Mock(side_effect=port_callback)
 
-def init_mcu(mcu_name, freq=16000000):
-    # type: (str, int) -> Avr
+        for port in ports:
+            p = self.mcu.irq.ioport_register_notify(callback, (port[0], int(port[1:])))
+            p.get_irq().name = port
 
-    return Avr(mcu=mcu_name, f_cpu=freq)
+    def new_pin_val(self, port_pin, new_val):
+        # type: ((str, int), int) -> None
 
+        irq = self.mcu.irq.getioport(port_pin)
+        avr_raise_irq(irq, new_val)
 
-def port_callback(irq, new_val, mcu_name, socket):
-    # type: (..., int, str, Socket) -> None
+    def run(self):
+        self.mcu.run()
 
-    msg = mcu_name + " change " + irq.name[0] + " " + irq.name[1] + " " + new_val
-    socket.socket.send_msg(msg)
-
-
-def bind_callback_for_digit_pins(mcu, ports):
-    # type: (Avr, str) -> None
-
-    callback = Mock(side_effect=port_callback)
-
-    for port in ports:
-        mcu.irq.ioport_register_notify(callback, (port[0], int(port[1:])))
-
-
-def new_pin_val(mcu, port_pin, new_val):
-    # type: (Avr, (str, int), int) -> None
-
-    irq = mcu.irq.getioport(port_pin)
-    avr_raise_irq(irq, new_val)
+    def terminate(self):
+        self.mcu.terminate()
 
 
-def msg_parser(new_msg, socket, controllers):
-    # type: (str, socket, [Avr]) -> None
-    """ Prototype - mcu is only atmega328
-        TODO: init, destroy, etc
-        TODO: collection of controllers as set
-    """
+class Controllers:
 
-    split_msg = new_msg.split()
-    first_word = split_msg[0]
+    def __init__(self):
+        self._controllers = []
+        self.socket = Socket()
 
-    if first_word == 'check':
-        socket.send_msg('ok')
-    else:
-        for controller in controllers:
-            if controller.mcu == split_msg[1]:
-                if first_word == 'change':
-                    new_pin_val(controller, (split_msg[2], split_msg[3]), int(split_msg[4]))
-                elif first_word == 'upload':
-                    upload_firmware(controller, split_msg[2])
+    def msg_parser(self, new_msg):
+        """ Prototype - mcu is only atmega328
+            TODO: init, destroy, etc
+            TODO: collection of controllers as set
+        """
+
+        split_msg = new_msg.split()
+        first_word = split_msg[0]
+
+        if first_word == 'check':
+            self.socket.send_msg('ok')
+        else:
+            for controller in self._controllers:
+                if controller.mcu_name == split_msg[1]:
+                    if first_word == 'change':
+                        controller.new_pin_val((split_msg[2], split_msg[3]), int(split_msg[4]))
+                    elif first_word == 'upload':
+                        controller.upload_firmware(split_msg[2])
+
+    def add_mcu(self, mcu_name, freq=16000000):
+        self._controllers.append(Controller(self.socket, mcu_name, freq))
+
+    def run(self):
+        for controller in self._controllers:
+            controller.run()
+
+    def terminate(self):
+        for controller in self._controllers:
+            controller.terminate()
 
 
 if __name__ == '__main__':
-    socket = Socket()
-    socket.init_socket()
+    controllers = Controllers()
+    controllers.socket.init_socket()
 
-    msg_recv_thread = Thread(target=socket.recv_msgs)
+    msg_recv_thread = Thread(target=controllers.socket.recv_msgs)
     msg_recv_thread.start()
 
-    controllers = [init_mcu('atmega328')]
+    controllers.add_mcu('atmega328')
+    controllers.run()
 
     while msg_recv_thread.is_alive():
-        if not socket.msg_queue.empty():
-            msg = socket.msg_queue.get()
-            msg_parser(msg, socket, controllers)
+        if not controllers.socket.msg_queue.empty():
+            msg = controllers.socket.msg_queue.get()
+            controllers.msg_parser(msg)
 
-    print "end"
+    controllers.terminate()
     exit(0)

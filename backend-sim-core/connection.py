@@ -18,18 +18,19 @@ class Socket:
         self.socket.send_string(msg)
 
     def recv_msgs(self):
+
+        self.socket.RCVTIMEO = 10000 * 1
+
         while True:
             try:
                 msg = self.socket.recv(zmq.NOBLOCK)
                 self.msg_queue.put(msg)
 
             except ZMQError:
-                self.socket.RCVTIMEO = 10000 * 1
                 self.send_msg("check")
 
                 try:
                     msg = self.socket.recv()
-                    self.socket.RCVTIMEO = -1
                     self.msg_queue.put(msg)
 
                 except ZMQError:
