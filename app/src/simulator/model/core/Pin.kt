@@ -11,7 +11,7 @@ class Pin(
 
   fun getRelativeElement() = this.relativeElement
 
-  fun setValue(newValue: Int) {
+  @Synchronized fun setValue(newValue: Int) {
     this.value = newValue
   }
 

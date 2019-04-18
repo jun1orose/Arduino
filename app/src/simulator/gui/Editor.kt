@@ -16,6 +16,7 @@ class Editor(val base: SimulatorBase): JFrame() {
 
   init {
     this.model = Model(this.backend)
+    this.model.start()
 
     initSimulatorUI("Emulator")
     setCustomCloseOperation()
@@ -48,6 +49,7 @@ class Editor(val base: SimulatorBase): JFrame() {
         this@Editor.isVisible = false
         this@Editor.dispose()
         this@Editor.base.editor = null
+        this@Editor.backend.closeSocket()
         this@Editor.backend.stopProcExec()
       }
     })

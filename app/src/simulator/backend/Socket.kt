@@ -1,4 +1,4 @@
-package simulator.model
+package simulator.backend
 
 import org.zeromq.SocketType
 import org.zeromq.ZContext
@@ -9,20 +9,19 @@ class Socket: Thread() {
 
   private val port = 5555
   private val incomingMsgQueue: Queue<String> = LinkedList<String>()
-  private lateinit var socket: ZMQ.Socket
+  private val socket: ZMQ.Socket
+  private val context: ZContext = ZContext()
 
   init {
-    ZContext().use {
-      this.socket = it.createSocket(SocketType.PAIR)
-      this.socket.bind("tcp://*:$port")
-    }
+    this.socket = context.createSocket(SocketType.PAIR)
+    this.socket.bind("tcp://*:$port")
   }
 
   override fun run() {
     while(!Thread.currentThread().isInterrupted) {
-      val msg = this.socket.recvStr()
-      if(msg.isNotEmpty()) {
-        incomingMsgQueue.add(msg)
+      val msg = this.socket.recvStr(ZMQ.NOBLOCK)
+      if (msg != null) {
+        this.incomingMsgQueue.add(msg)
       }
     }
   }
@@ -36,6 +35,12 @@ class Socket: Thread() {
       e.printStackTrace()
       "Another process does't bound"
     }
+  }
+
+  fun getMsgQueue() = this.incomingMsgQueue
+
+  fun closeSocket() {
+    this.socket.close()
   }
 }
 

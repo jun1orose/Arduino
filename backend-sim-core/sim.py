@@ -21,11 +21,12 @@ class Controller:
     def upload_firmware(self, fw_path):
         fw = Firmware(fw_path)
         self.mcu.load_firmware(fw)
+        self.mcu.run()
 
     def bind_callback_for_digit_pins(self, ports):
 
         def port_callback(irq, new_val):
-            msg = self.mcu_name + " change " + irq.name[0] + " " + irq.name[1] + " " + str(new_val)
+            msg = "change " + self.mcu_name + ' ' + irq.name[0] + " " + irq.name[1] + " " + str(new_val)
             self.socket.send_msg(msg)
 
         callback = Mock(side_effect=port_callback)
@@ -48,6 +49,10 @@ class Controller:
 
 
 class Controllers:
+    """
+        TODO: move bind_callback_for_digit_pins from Controller
+        TODO: delete self.socket from Controller
+    """
 
     def __init__(self):
         self._controllers = []
@@ -64,6 +69,8 @@ class Controllers:
 
         if first_word == 'check':
             self.socket.send_msg('ok')
+        elif first_word == 'ok':
+            pass
         else:
             for controller in self._controllers:
                 if controller.mcu_name == split_msg[1]:

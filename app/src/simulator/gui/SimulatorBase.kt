@@ -2,7 +2,7 @@ package simulator.gui
 
 class SimulatorBase  {
 
-  private var editor: Editor? = null
+  var editor: Editor? = null
 
   fun createSimulatorEditor() {
     if(this.editor == null) {

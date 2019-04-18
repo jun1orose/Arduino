@@ -5,7 +5,7 @@ import simulator.model.core.MCU
 import simulator.model.core.Pin
 import java.awt.Point
 
-class Model(private val backend: PythonModule) {
+class Model(private val backend: PythonModule): Thread() {
 
   private val pins = mutableSetOf<Pin>()
   private val controllers = mutableSetOf<MCU>()
@@ -21,8 +21,30 @@ class Model(private val backend: PythonModule) {
 
   private fun notifyBackend(mcuName:String, pinName: String, newValue: Int) {
     if(pinName[1].isDigit()) {
-      val newMsg = "$mcuName ${pinName[0]} ${pinName.substring(1)} $newValue"
+      val newMsg = "change $mcuName ${pinName[0]} ${pinName.substring(1)} $newValue"
       sendMsg(newMsg)
+    }
+  }
+
+  override fun run() {
+    while(!Thread.currentThread().isInterrupted) {
+
+      val msg = this.backend.getMsgQueue().poll()
+
+      if (msg != null) {
+
+        val splitMsg = msg.split(" ")
+        val firstWord = splitMsg[0]
+
+        when(firstWord) {
+          "change" -> {
+            val pin = getMCU(splitMsg[1])?.getPin(splitMsg[2] + splitMsg[3])
+            pin?.setValue(splitMsg[4].toInt())
+          }
+          "check" -> sendMsg("ok")
+        }
+      }
+
     }
   }
 
@@ -33,14 +55,15 @@ class Model(private val backend: PythonModule) {
   fun addPin(pinName: String, pinValue: Int? = null, pinPos: Point, relativeElement: String) {
 
     val relElem = getMCU(relativeElement)
-    relElem?.addPin(pinName, pinPos)
+    val newPin = Pin(pinName, pinValue, pinPos, relElem)
+    relElem?.addPin(newPin)
 
     pins.find { it.name == pinName}?.apply {
       this.pos = pinPos
       return
     }
 
-    this.pins.add(Pin(pinName, pinValue, pinPos, relativeElement))
+    this.pins.add(newPin)
   }
 
   fun clearPins() {

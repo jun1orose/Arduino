@@ -6,19 +6,21 @@ class MCU(private val name: String) {
 
   private  val pins: MutableSet<Pin> = mutableSetOf()
 
-  fun addPin(pinName: String, pinPos: Point) {
+  fun addPin(newPin: Pin) {
 
-    pins.find { it.name == pinName}?.apply {
-      this.pos = pinPos
+    pins.find { it.name == newPin.name}?.apply {
+      this.pos = newPin.pos
       return
     }
 
-    pins.add(Pin(pinName, null, pinPos, this@MCU))
+    pins.add(newPin)
   }
 
   fun getPinByPos(pinPos: Point) = pins.find { it.pos == pinPos }
 
   fun getPins() = this.pins
+
+  fun getPin(pinName: String) = pins.find { it.name == pinName }
 
   fun getName() = this.name
 }
