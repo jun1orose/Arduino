@@ -59,10 +59,6 @@ class Controllers:
         self.socket = Socket()
 
     def msg_parser(self, new_msg):
-        """ Prototype - mcu is only atmega328
-            TODO: init, destroy, etc
-            TODO: collection of controllers as set
-        """
 
         split_msg = new_msg.split()
         first_word = split_msg[0]
@@ -71,6 +67,10 @@ class Controllers:
             self.socket.send_msg('ok')
         elif first_word == 'ok':
             pass
+        elif first_word == 'init':
+            self.add_mcu(split_msg[1])
+        elif first_word == 'terminate':
+            self.terminate(split_msg[1])
         else:
             for controller in self._controllers:
                 if controller.mcu_name == split_msg[1]:
@@ -86,9 +86,19 @@ class Controllers:
         for controller in self._controllers:
             controller.run()
 
-    def terminate(self):
+    def get_controller_by_name(self, mcu_name):
         for controller in self._controllers:
-            controller.terminate()
+            if controller.mcu_name == mcu_name:
+                return controller
+
+    def terminate(self, mcu_name=''):
+        if mcu_name != '':
+            mcu = self.get_controller_by_name(mcu_name)
+            mcu.terminate()
+            return
+
+        for mcu in self._controllers:
+            mcu.terminate()
 
 
 if __name__ == '__main__':
