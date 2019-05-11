@@ -5,7 +5,10 @@ import simulator.model.core.MCU
 import simulator.model.core.Pin
 import java.awt.Point
 
-class Model(private val backend: PythonModule): Thread() {
+class Model(
+  private val backend: PythonModule,
+  private val arduinoEditor: processing.app.Editor
+): Thread() {
 
   private val pins = mutableSetOf<Pin>()
   private val controllers = mutableSetOf<MCU>()
@@ -72,7 +75,11 @@ class Model(private val backend: PythonModule): Thread() {
 
   fun addMCU(mcuName: String) {
     controllers.add(MCU(mcuName))
+    arduinoEditor.simChanged()
   }
 
   fun getMCU(mcuName: String) = controllers.find { it.getName() == mcuName }
+
+  fun getControllers() = this.controllers
+
 }

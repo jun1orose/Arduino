@@ -3,10 +3,15 @@ package simulator.gui
 class SimulatorBase  {
 
   var editor: Editor? = null
+  var arduinoEditor: processing.app.Editor? = null
 
-  fun createSimulatorEditor() {
+  fun createSimulatorEditor(arduinoEditor: processing.app.Editor) {
     if(this.editor == null) {
-      this.editor = Editor(this@SimulatorBase)
+      this.editor = Editor(this@SimulatorBase, arduinoEditor)
+    }
+
+    if(this.arduinoEditor == null) {
+      this.arduinoEditor = arduinoEditor
     }
   }
 
@@ -25,5 +30,16 @@ class SimulatorBase  {
     else {
       return "Simulator not active!"
     }
+  }
+
+  fun getControllers(): MutableList<String> {
+    val controllers = this.editor?.getModel()?.getControllers()
+
+    val names = mutableListOf<String>()
+    controllers?.forEach {
+      names.add(it.getName())
+    }
+
+    return names
   }
 }

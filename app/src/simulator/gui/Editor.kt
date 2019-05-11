@@ -1,5 +1,6 @@
 package simulator.gui
 
+import processing.app.Editor
 import simulator.backend.PythonModule
 import simulator.model.Model
 import java.awt.BorderLayout
@@ -9,13 +10,13 @@ import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JPanel
 
-class Editor(val base: SimulatorBase): JFrame() {
+class Editor(val base: SimulatorBase, arduinoEditor: Editor): JFrame() {
 
   private val backend: PythonModule = PythonModule()
   private val model: Model
 
   init {
-    this.model = Model(this.backend)
+    this.model = Model(this.backend, arduinoEditor)
     this.model.start()
 
     initSimulatorUI("Emulator")
