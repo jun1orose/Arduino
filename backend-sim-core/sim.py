@@ -1,6 +1,8 @@
 from mock import Mock
 from pysimavr.avr import Avr
 from pysimavr.firmware import Firmware
+from pysimavr.vcdfile import VcdFile
+from pysimavr.connect import connect_pins_by_rule
 from pysimavr.swig.simavr import avr_raise_irq
 from connection import Socket
 from threading import Thread
@@ -12,19 +14,47 @@ atmega_328_digit_pin_table = ['C6', 'D0', 'D1', 'D2', 'D3', 'D4', 'B6', 'B7', 'D
 
 class Controller:
 
-    def __init__(self, sock, mcu_name, freq=16000000):
+    def __init__(self, sock, mcu_name, freq=16000000, version=1):
         self.mcu_name = mcu_name
         self.mcu = Avr(mcu=mcu_name, f_cpu=freq)
-        self.bind_callback_for_digit_pins(atmega_328_digit_pin_table)
         self.socket = sock
+        self.fw_path = None
+        self.version = version
+        self.bind_callback_for_digit_pins(atmega_328_digit_pin_table)
+        self.vcd = None
+        self.connect_vcd()
 
     def upload_firmware(self, fw_path):
+        self.fw_path = fw_path
         fw = Firmware(fw_path)
         self.mcu.load_firmware(fw)
-        self.mcu.run()
+
+    def connect_vcd(self):
+        self.vcd = VcdFile(self.mcu, filename='out' + str(self.version))
+        connect_pins_by_rule('''
+                            avr.D0 ==> vcd
+                            avr.D1 ==> vcd
+                            avr.D2 ==> vcd
+                            avr.D3 ==> vcd
+                            avr.D4 ==> vcd
+                            avr.D5 ==> vcd
+                            avr.D6 ==> vcd
+                            avr.D7 ==> vcd
+
+                            avr.B0 ==> vcd
+                            avr.B1 ==> vcd
+                            avr.B2 ==> vcd
+                            avr.B3 ==> vcd
+                            avr.B4 ==> vcd
+                            avr.B5 ==> vcd
+                            ''',
+                             dict(
+                                 avr=self.mcu
+                             ),
+                             vcd=self.vcd
+                             )
 
     def bind_callback_for_digit_pins(self, ports):
-
         def port_callback(irq, new_val):
             msg = "change " + self.mcu_name + ' ' + irq.name[0] + " " + irq.name[1] + " " + str(new_val)
             self.socket.send_msg(msg)
@@ -42,9 +72,16 @@ class Controller:
         avr_raise_irq(irq, new_val)
 
     def run(self):
+        self.vcd.start()
         self.mcu.run()
 
+    def pause(self):
+        self.vcd.stop()
+        self.mcu.pause()
+
     def terminate(self):
+        if self.vcd:
+            self.vcd.terminate()
         self.mcu.terminate()
 
 
@@ -63,10 +100,18 @@ class Controllers:
         split_msg = new_msg.split()
         first_word = split_msg[0]
 
+        print first_word
+
         if first_word == 'check':
             self.socket.send_msg('ok')
         elif first_word == 'ok':
             pass
+        elif first_word == 'start':
+            self.run()
+        elif first_word == 'pause':
+            self.pause()
+        elif first_word == 'stop':
+            self.stop()
         elif first_word == 'init':
             self.add_mcu(split_msg[1])
         else:
@@ -91,9 +136,24 @@ class Controllers:
             if controller.mcu_name == mcu_name:
                 return controller
 
+    def pause(self):
+        for controller in self._controllers:
+            controller.pause()
+
+    def stop(self):
+        for controller in self._controllers:
+            self._controllers.remove(controller)
+            self.copy_mcu(controller)
+
     def terminate(self):
         for mcu in self._controllers:
             mcu.terminate()
+
+    def copy_mcu(self, controller):
+        mcu = Controller(self.socket, controller.mcu_name, version=controller.version + 1)
+        if not (controller.fw_path is None):
+            mcu.upload_firmware(controller.fw_path)
+        self._controllers.append(mcu)
 
 
 if __name__ == '__main__':
@@ -102,9 +162,6 @@ if __name__ == '__main__':
 
     msg_recv_thread = Thread(target=controllers.socket.recv_msgs)
     msg_recv_thread.start()
-
-    controllers.add_mcu('atmega328')
-    controllers.run()
 
     while msg_recv_thread.is_alive():
         if not controllers.socket.msg_queue.empty():

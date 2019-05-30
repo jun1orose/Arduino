@@ -12,6 +12,7 @@ class Model(
 
   private val pins = mutableSetOf<Pin>()
   private val controllers = mutableSetOf<MCU>()
+  private var state = STATE.NOT_ACTIVE
 
   fun changePinValue(pin: Pin, newValue: Int) {
     pin.setValue(newValue)
@@ -55,7 +56,7 @@ class Model(
 
   fun getPins() = this.pins
 
-  fun addPin(pinName: String, pinValue: Int? = null, pinPos: Point, relativeElement: String) {
+  fun addPin(pinName: String, pinValue: Int = 0, pinPos: Point, relativeElement: String) {
 
     val relElem = getMCU(relativeElement)
     val newPin = Pin(pinName, pinValue, pinPos, relElem)
@@ -69,12 +70,15 @@ class Model(
     this.pins.add(newPin)
   }
 
-  fun clearPins() {
-    pins.clear()
+  private fun clearPins() {
+    pins.forEach {
+      it.setValue(0)
+    }
   }
 
   fun addMCU(mcuName: String) {
     controllers.add(MCU(mcuName))
+    sendMsg("init $mcuName")
     arduinoEditor.simChanged()
   }
 
@@ -82,4 +86,25 @@ class Model(
 
   fun getControllers() = this.controllers
 
+  fun startModel() {
+    this.state = STATE.ACTIVE
+    sendMsg("start")
+  }
+
+  fun pauseModel() {
+    this.state = STATE.PAUSED
+    sendMsg("pause")
+  }
+
+  fun stopModel() {
+    this.state = STATE.NOT_ACTIVE
+    clearPins()
+    sendMsg("stop")
+  }
+}
+
+enum class STATE {
+  PAUSED,
+  NOT_ACTIVE,
+  ACTIVE
 }

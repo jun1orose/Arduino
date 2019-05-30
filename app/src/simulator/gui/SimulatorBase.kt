@@ -16,8 +16,9 @@ class SimulatorBase  {
   }
 
   // only atmega328 for prototype
-  @JvmOverloads fun uploadFirmware(sketchPath: String,
-                     mcuName: String = "atmega328"
+  @JvmOverloads fun uploadFirmware(
+    sketchPath: String,
+    mcuName: String = "atmega328"
   ): String {
 
     if(this.editor != null) {

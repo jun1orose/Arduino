@@ -19,7 +19,7 @@ class PythonModule {
     return this.socket.sendMsg("upload $mcuName $sketchPath")
   }
 
-  fun sendMsg(newMsg: String) = socket.sendMsg(newMsg)
+  @Synchronized fun sendMsg(newMsg: String) = socket.sendMsg(newMsg)
 
   fun getMsgQueue() = this.socket.getMsgQueue()
 

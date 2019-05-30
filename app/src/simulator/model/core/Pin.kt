@@ -4,7 +4,7 @@ import java.awt.Point
 
 class Pin(
   val name: String,
-  private var value: Int?,
+  private var value: Int,
   var pos: Point,
   private val relativeElement: Any?
 ) {

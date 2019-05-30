@@ -12,18 +12,18 @@ class Socket:
 
     def init_socket(self):
         self.socket = self.context.socket(zmq.PAIR)
-        self.socket.connect("tcp://localhost:%s" % self.port)
+        self.socket.bind("tcp://*:%s" % self.port)
 
     def send_msg(self, msg):
         self.socket.send_string(msg)
 
     def recv_msgs(self):
 
-        self.socket.RCVTIMEO = 10000 * 1
+        self.socket.RCVTIMEO = 3000 * 1
 
         while True:
             try:
-                msg = self.socket.recv(zmq.NOBLOCK)
+                msg = self.socket.recv()
                 self.msg_queue.put(msg)
 
             except ZMQError:

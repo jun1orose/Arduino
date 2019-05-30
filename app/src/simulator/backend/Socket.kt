@@ -14,7 +14,8 @@ class Socket: Thread() {
 
   init {
     this.socket = context.createSocket(SocketType.PAIR)
-    this.socket.bind("tcp://*:$port")
+    Thread.sleep(500)
+    this.socket.connect("tcp://*:$port")
   }
 
   override fun run() {
