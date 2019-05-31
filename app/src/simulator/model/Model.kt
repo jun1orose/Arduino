@@ -7,8 +7,8 @@ import java.awt.Point
 
 class Model(
   private val backend: PythonModule,
-  private val arduinoEditor: processing.app.Editor
-): Thread() {
+  private val mainEditor: processing.app.Editor
+) : Thread() {
 
   private val pins = mutableSetOf<Pin>()
   private val controllers = mutableSetOf<MCU>()
@@ -18,37 +18,34 @@ class Model(
     pin.setValue(newValue)
     val relativeElement = pin.getRelativeElement() as? MCU
 
-    if(relativeElement != null) {
+    if (relativeElement != null) {
       notifyBackend(relativeElement.getName(), pin.name, newValue)
     }
   }
 
-  private fun notifyBackend(mcuName:String, pinName: String, newValue: Int) {
-    if(pinName[1].isDigit()) {
+  private fun notifyBackend(mcuName: String, pinName: String, newValue: Int) {
+    if (pinName[1].isDigit()) {
       val newMsg = "change $mcuName ${pinName[0]} ${pinName.substring(1)} $newValue"
       sendMsg(newMsg)
     }
   }
 
   override fun run() {
-    while(!Thread.currentThread().isInterrupted) {
+    val queue = this.backend.getQueue()
 
-      val msg = this.backend.getMsgQueue().poll()
+    while (!Thread.currentThread().isInterrupted) {
 
-      if (msg != null) {
+      val msg = queue.take()
+      val splitMsg = msg.split(" ")
+      val firstWord = splitMsg[0]
 
-        val splitMsg = msg.split(" ")
-        val firstWord = splitMsg[0]
-
-        when(firstWord) {
-          "change" -> {
-            val pin = getMCU(splitMsg[1])?.getPin(splitMsg[2] + splitMsg[3])
-            pin?.setValue(splitMsg[4].toInt())
-          }
-          "check" -> sendMsg("ok")
+      when (firstWord) {
+        "change" -> {
+          val pin = getMCU(splitMsg[1])?.getPin(splitMsg[2] + splitMsg[3])
+          pin?.setValue(splitMsg[4].toInt())
         }
+        "check" -> sendMsg("ok")
       }
-
     }
   }
 
@@ -62,7 +59,7 @@ class Model(
     val newPin = Pin(pinName, pinValue, pinPos, relElem)
     relElem?.addPin(newPin)
 
-    pins.find { it.name == pinName}?.apply {
+    pins.find { it.name == pinName }?.apply {
       this.pos = pinPos
       return
     }
@@ -79,7 +76,7 @@ class Model(
   fun addMCU(mcuName: String) {
     controllers.add(MCU(mcuName))
     sendMsg("init $mcuName")
-    arduinoEditor.simChanged()
+    mainEditor.simChanged()
   }
 
   fun getMCU(mcuName: String) = controllers.find { it.getName() == mcuName }

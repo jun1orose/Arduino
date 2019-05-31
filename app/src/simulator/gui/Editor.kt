@@ -14,13 +14,16 @@ import javax.imageio.ImageIO
 import javax.swing.*
 import javax.swing.event.MenuEvent
 
-class Editor(val base: SimulatorBase, arduinoEditor: Editor): JFrame() {
+class Editor(
+  val base: SimulatorBase,
+  baseEditor: Editor
+) : JFrame() {
 
-  private val backend: PythonModule = PythonModule()
+  private val backend: PythonModule = PythonModule(this@Editor)
   private val model: Model
 
   init {
-    this.model = Model(this.backend, arduinoEditor)
+    this.model = Model(this.backend, baseEditor)
     this.model.start()
     Thread.sleep(500)
 
@@ -51,7 +54,7 @@ class Editor(val base: SimulatorBase, arduinoEditor: Editor): JFrame() {
 
   private fun buildDebug(menuBar: JMenuBar) {
     val debug = JMenu("Debug")
-    debug.addMenuListener(object: StubMenuListener() {
+    debug.addMenuListener(object : StubMenuListener() {
       override fun menuSelected(e: MenuEvent?) {
         DebugInfo(this@Editor)
       }

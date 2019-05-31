@@ -1,8 +1,11 @@
 package simulator.backend
 
-class PythonModule {
+import simulator.gui.Editor
 
-  private val socket = Socket()
+
+class PythonModule(editor: Editor) {
+
+  private val socket = Socket(editor)
   private val mcuProcess: Process
   private val path = "backend-sim-core/"
 
@@ -21,7 +24,7 @@ class PythonModule {
 
   @Synchronized fun sendMsg(newMsg: String) = socket.sendMsg(newMsg)
 
-  fun getMsgQueue() = this.socket.getMsgQueue()
-
   fun closeSocket() = this.socket.closeSocket()
+
+  fun getQueue() = this.socket.getQueue()
 }
