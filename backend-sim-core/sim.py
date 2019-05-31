@@ -164,9 +164,8 @@ if __name__ == '__main__':
     msg_recv_thread.start()
 
     while msg_recv_thread.is_alive():
-        if not controllers.socket.msg_queue.empty():
-            msg = controllers.socket.msg_queue.get()
-            controllers.msg_parser(msg)
+        msg = controllers.socket.msg_queue.get()
+        controllers.msg_parser(msg)
 
     controllers.terminate()
     exit(0)
