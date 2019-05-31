@@ -18,7 +18,8 @@ class Socket(editor: Editor): Thread() {
 
   init {
     this.socket = context.createSocket(SocketType.PAIR)
-    this.socket.receiveTimeOut = 5000
+    this.socket.receiveTimeOut = 3000
+    this.socket.sendTimeOut = 3000
     this.model = editor.getModel()
     Thread.sleep(500)
     this.socket.connect("tcp://*:$port")
@@ -27,12 +28,25 @@ class Socket(editor: Editor): Thread() {
   override fun run() {
     try {
       while(!Thread.currentThread().isInterrupted) {
-        val msg = this.socket.recvStr()
+        var msg = this.socket.recvStr()
+
+        if (msg == null) {
+          sendMsg("check")
+          msg = this.socket.recvStr()
+
+          if (msg == null) {
+            closeSocket()
+          }
+        }
         msgQueue.put(msg)
       }
     }
     catch (e: Exception) {
+      //stop proc when it receiving msg
       e.printStackTrace()
+    }
+    finally {
+        closeSocket()
     }
   }
 
@@ -49,6 +63,7 @@ class Socket(editor: Editor): Thread() {
 
   fun closeSocket() {
     this.socket.close()
+    this.context.destroy()
   }
 
   fun getQueue() = this.msgQueue

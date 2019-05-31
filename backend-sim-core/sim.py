@@ -6,6 +6,7 @@ from pysimavr.connect import connect_pins_by_rule
 from pysimavr.swig.simavr import avr_raise_irq
 from connection import Socket
 from threading import Thread
+import Queue
 
 atmega_328_digit_pin_table = ['C6', 'D0', 'D1', 'D2', 'D3', 'D4', 'B6', 'B7', 'D5', 'D6',
                               'D7', 'B0', 'B1', 'B2', 'B3', 'B4', 'B5', 'C0',
@@ -164,8 +165,11 @@ if __name__ == '__main__':
     msg_recv_thread.start()
 
     while msg_recv_thread.is_alive():
-        msg = controllers.socket.msg_queue.get()
-        controllers.msg_parser(msg)
+        try:
+            msg = controllers.socket.msg_queue.get(timeout=6)
+            controllers.msg_parser(msg)
+        except Queue.Empty:
+            pass
 
     controllers.terminate()
     exit(0)

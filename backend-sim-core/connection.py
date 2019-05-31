@@ -18,8 +18,8 @@ class Socket:
         self.socket.send_string(msg)
 
     def recv_msgs(self):
-
         self.socket.RCVTIMEO = 3000 * 1
+        self.socket.SNDTIMEO = 3000 * 1
 
         while True:
             try:
@@ -27,16 +27,12 @@ class Socket:
                 self.msg_queue.put(msg)
 
             except ZMQError:
-                self.send_msg("check")
-
                 try:
+                    self.send_msg("check")
                     msg = self.socket.recv()
                     self.msg_queue.put(msg)
 
                 except ZMQError:
                     self.socket.close()
+                    self.context.term()
                     return
-
-
-
-

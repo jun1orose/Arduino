@@ -45,6 +45,7 @@ class Model(
           pin?.setValue(splitMsg[4].toInt())
         }
         "check" -> sendMsg("ok")
+        "ok" -> {}
       }
     }
   }
