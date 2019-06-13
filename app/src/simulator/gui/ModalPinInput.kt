@@ -17,7 +17,7 @@ class ModalPinInput(chosenPin: Pin, editor: Editor): JDialog(editor, true) {
 
     val text = JLabel("Binary pin value: ")
     val inputField = JTextField()
-    inputField.text = chosenPin.getValue()?.toString() ?: "empty"
+    inputField.text = chosenPin.getValue().toString()
 
     inputField.setSize(20, 10)
     this.layout = GridLayout(1, 2)

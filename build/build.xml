@@ -588,6 +588,7 @@
   <target name="linux-clean" depends="subprojects-clean" description="Clean linux version">
     <delete dir="linux/work" />
     <delete dir="backend-sim-core" />
+    <delete dir="resources" />
     <delete>
       <fileset dir="linux" includes="arduino-*linux*.tar.xz"/>
     </delete>
@@ -612,6 +613,7 @@
     <mkdir dir="linux/work" />
     <mkdir dir="linux/work/${staging_hardware_folder}" />
     <mkdir dir="backend-sim-core" />
+    <mkdir dir="resources" />
 
     <copy todir="linux/work">
       <fileset dir="shared" includes="lib/**" />
@@ -636,6 +638,9 @@
 
     <copy todir="backend-sim-core">
       <fileset dir="../backend-sim-core/"/>
+    </copy>
+    <copy todir="resources">
+      <fileset dir="../resources/"/>
     </copy>
 
     <antcall target="assemble">

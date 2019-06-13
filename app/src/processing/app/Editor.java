@@ -31,7 +31,6 @@ import cc.arduino.view.GoToLineNumber;
 import cc.arduino.view.StubMenuListener;
 import cc.arduino.view.findreplace.FindReplace;
 import com.jcraft.jsch.JSchException;
-import simulator.gui.SimulatorBase;
 import jssc.SerialPortException;
 import processing.app.debug.RunnerException;
 import processing.app.forms.PasswordAuthorizationDialog;
@@ -41,6 +40,7 @@ import processing.app.syntax.PdeKeywords;
 import processing.app.syntax.SketchTextArea;
 import processing.app.tools.MenuScroller;
 import processing.app.tools.Tool;
+import simulator.gui.SimulatorBase;
 
 import javax.swing.*;
 import javax.swing.event.MenuEvent;
@@ -80,6 +80,7 @@ public class Editor extends JFrame implements RunnerListener {
   final Platform platform;
   private JMenu recentSketchesMenu;
   private JMenu programmersMenu;
+  private JMenu simulatorMenu;
   private final Box upper;
   private ArrayList<EditorTab> tabs = new ArrayList<>();
   private int currentTabIndex = -1;
@@ -710,6 +711,12 @@ public class Editor extends JFrame implements RunnerListener {
     item = new JMenuItem(tr("Burn Bootloader"));
     item.addActionListener(e -> handleBurnBootloader());
     toolsMenu.add(item);
+
+    toolsMenu.addSeparator();
+    simulatorMenu = new JMenu(tr("Simulator"));
+    MenuScroller.setScrollerFor(simulatorMenu);
+    simulatorMenu.setEnabled(false);
+    toolsMenu.add(simulatorMenu);
 
     toolsMenu.addMenuListener(new StubMenuListener() {
       public void menuSelected(MenuEvent e) {
@@ -2465,11 +2472,11 @@ public class Editor extends JFrame implements RunnerListener {
   private SimulatorBase simBase = new SimulatorBase();
   // behavior for Simulator button
   public void handleSimulator() {
-    simBase.createSimulatorEditor();
+    simBase.createSimulatorEditor(this);
   }
 
   // behavior for Upload to simulator
-  public void handleUploadToSimulator() {
+  public void handleUploadToSimulator(String mcuName) {
     File buildPath = null;
 
     try {
@@ -2482,10 +2489,27 @@ public class Editor extends JFrame implements RunnerListener {
     if(buildPath != null) {
       if(buildPath.listFiles() != null && Objects.requireNonNull(buildPath.listFiles()).length != 0) {
         String sketchPath = buildPath.getAbsolutePath() + "/" + sketch.getName() + ".ino.elf";
-        String status = simBase.uploadFirmware(sketchPath);
+        String status = simBase.uploadFirmware(sketchPath, mcuName);
         this.status.notice(status);
       }
     }
+  }
+
+  public void simChanged() {
+    simulatorMenu.removeAll();
+    List <String> controllers = this.simBase.getControllers();
+
+    JMenuItem item;
+
+    if (controllers.size() != 0) {
+      for (String mcu : controllers) {
+        item = new JMenuItem(tr(mcu));
+        item.addActionListener(e -> handleUploadToSimulator(mcu));
+        simulatorMenu.add(item);
+      }
+    }
+
+    simulatorMenu.setEnabled(controllers.size() > 0);
   }
 
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

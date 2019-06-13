@@ -3,16 +3,22 @@ package simulator.gui
 class SimulatorBase  {
 
   var editor: Editor? = null
+  var arduinoEditor: processing.app.Editor? = null
 
-  fun createSimulatorEditor() {
+  fun createSimulatorEditor(arduinoEditor: processing.app.Editor) {
     if(this.editor == null) {
-      this.editor = Editor(this@SimulatorBase)
+      this.editor = Editor(this@SimulatorBase, arduinoEditor)
+    }
+
+    if(this.arduinoEditor == null) {
+      this.arduinoEditor = arduinoEditor
     }
   }
 
   // only atmega328 for prototype
-  @JvmOverloads fun uploadFirmware(sketchPath: String,
-                     mcuName: String = "atmega328"
+  @JvmOverloads fun uploadFirmware(
+    sketchPath: String,
+    mcuName: String = "atmega328"
   ): String {
 
     if(this.editor != null) {
@@ -25,5 +31,16 @@ class SimulatorBase  {
     else {
       return "Simulator not active!"
     }
+  }
+
+  fun getControllers(): MutableList<String> {
+    val controllers = this.editor?.getModel()?.getControllers()
+
+    val names = mutableListOf<String>()
+    controllers?.forEach {
+      names.add(it.getName())
+    }
+
+    return names
   }
 }

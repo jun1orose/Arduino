@@ -3,12 +3,12 @@ package simulator.gui
 import simulator.shapes.MCU
 import simulator.shapes.Pin
 import java.awt.*
+import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import java.awt.event.MouseListener
 import java.awt.image.BufferedImage
 import javax.swing.JComponent
 
-class CircuitComponent(private val editor: Editor): JComponent() {
+class CircuitComponent(private val editor: Editor) : JComponent() {
 
   private var buffer: BufferedImage? = null
   private var antiAlias = true
@@ -17,23 +17,18 @@ class CircuitComponent(private val editor: Editor): JComponent() {
   private val controllers = mutableListOf<MCU>()
 
   init {
-      this.addMouseListener(object : MouseListener {
-        override fun mouseClicked(p0: MouseEvent) {
-          val pos = Point(p0.x, p0.y)
-          for(pin in pins) {
-            if (pin.isPin(pos)) {
-              editor.getModel().getMCU("atmega328")?.getPinByPos(pin.pos)?.apply {
-                ModalPinInput(this, editor)
-              }
+    this.addMouseListener(object : MouseAdapter() {
+      override fun mouseClicked(e: MouseEvent) {
+        val pos = Point(e.x, e.y)
+        for (pin in pins) {
+          if (pin.isPin(pos)) {
+            editor.getModel().getMCU("atmega328")?.getPinByPos(pin.pos)?.apply {
+              ModalPinInput(this, editor)
             }
           }
         }
-
-        override fun mouseEntered(p0: MouseEvent?) {}
-        override fun mouseExited(p0: MouseEvent?) {}
-        override fun mousePressed(p0: MouseEvent?) {}
-        override fun mouseReleased(p0: MouseEvent?) {}
-      })
+      }
+    })
   }
 
   override fun paintComponent(g: Graphics?) {
@@ -42,10 +37,10 @@ class CircuitComponent(private val editor: Editor): JComponent() {
     controllers.clear()
 
     val needsNewBuffer = buffer == null
-        || width != buffer?.width
-        || height != buffer?.height
+      || width != buffer?.width
+      || height != buffer?.height
 
-    if(needsNewBuffer) {
+    if (needsNewBuffer) {
 
       buffer = GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.defaultConfiguration.createCompatibleImage(width, height)
 
@@ -73,7 +68,7 @@ class CircuitComponent(private val editor: Editor): JComponent() {
     }
   }
 
-  fun addPin(pinName: String,  pinImage: Pin, relElem: String = "") {
+  fun addPin(pinName: String, pinImage: Pin, relElem: String = "") {
     pins.add(pinImage)
     editor.getModel().addPin(pinName, pinPos = pinImage.pos, relativeElement = relElem)
   }
